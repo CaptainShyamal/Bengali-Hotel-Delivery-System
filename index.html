@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bengali Hotel - Redirecting...</title>
+  <style>
+    body {
+      background-color: #FCF9F2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #570000;
+    }
+    .loader {
+      text-align: center;
+    }
+    .spinner {
+      border: 4px solid rgba(87, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #800000;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <p>Welcoming you to Bengali Hotel...</p>
+  </div>
+  
+  <script>
+    // Perform instant local redirect without waiting for external script CDNs
+    try {
+      const session = localStorage.getItem('bh_customer_session');
+      if (session) {
+        JSON.parse(session); // validate JSON format
+        window.location.replace('Menu/index.html');
+      } else {
+        window.location.replace('login/log.html');
+      }
+    } catch (e) {
+      console.error('Session corruption detected, clearing...', e);
+      localStorage.removeItem('bh_customer_session');
+      window.location.replace('login/log.html');
+    }
+  </script>
+</body>
+</html>

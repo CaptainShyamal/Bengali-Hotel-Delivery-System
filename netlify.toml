@@ -1,0 +1,21 @@
+[build]
+  command = "node build.js"
+  publish = "."
+
+[[redirects]]
+  from = "/admin"
+  to = "/dashboard/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/checkout"
+  to = "/review order/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/orders"
+  to = "/thankyoupage/index.html"
+  status = 200
+  force = true

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bengali Hotel - Login</title>
+
+    <link rel="icon" href="logo.png?v=1.3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f8f5f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('../back.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.45; /* 55% transparency */
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #D4AF37;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .logo .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1A1A1A;
+            letter-spacing: 0.05em;
+            line-height: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #6d0d0d;
+            margin-bottom: 10px;
+        }
+
+        .sub-text {
+            text-align: center;
+            color: #5a413d;
+            font-size: 13px;
+            margin-bottom: 30px;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-bottom: 2px solid #ddd;
+            font-size: 15px;
+            outline: none;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        input::placeholder {
+            font-weight: 700;
+            color: #999;
+        }
+
+        input:focus {
+            border-color: #d32f2f;
+        }
+
+        .btn {
+            width: 100%;
+            background: #d32f2f; /* Red Color */
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 800;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #b71c1c;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #5a413d;
+            font-size: 13px;
+        }
+
+        /* Top Left Logo styles */
+        .top-left-logo {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .top-left-logo:hover {
+            transform: scale(1.03);
+            opacity: 0.95;
+        }
+
+        .top-left-logo img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #D4AF37;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+        }
+
+        .top-left-logo span {
+            font-family: Georgia, serif;
+            font-weight: 700;
+            color: #800000;
+            font-size: 1.25rem;
+            letter-spacing: 0.02em;
+        }
+
+        .top-left-logo span span {
+            color: #D4AF37;
+        }
+
+        @media (max-width: 768px) {
+            .top-left-logo {
+                position: absolute;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: transparent;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+            .top-left-logo:hover {
+                transform: translateX(-50%) scale(1.03);
+            }
+            body {
+                padding-top: 90px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-left-logo" onclick="window.location.href='../index.html'">
+        <img src="logo.png?v=1.3" alt="Bengali Hotel Logo">
+        <span>Bengali <span>Hotel</span></span>
+    </div>
+
+    <div class="container">
+
+        <div class="logo">
+            <span class="logo-text">SINCE</span>
+            <img src="logo.png?v=1.3" alt="Bengali Hotel Logo">
+            <span class="logo-text">1998</span>
+        </div>
+
+        <h1>Bengali Hotel</h1>
+
+        <p class="sub-text">
+            <strong>SAKET, NEW DELHI • DELIVERY TIME: 3 PM - 12 MIDNIGHT</strong>
+        </p>
+
+        <form id="loginForm">
+
+            <div class="input-group">
+                <label><strong>Customer Name</strong></label>
+                <input type="text" id="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="input-group">
+                <label><strong>Mobile Number</strong></label>
+                <input type="tel" id="mobile" placeholder="+91 10-digit number" maxlength="10" required>
+            </div>
+
+            <button type="submit" class="btn">
+                ENTER DINING EXPERIENCE
+            </button>
+
+        </form>
+
+        <div class="footer">
+            <div style="font-family: Georgia, serif; font-weight: bold; color: #800000; font-size: 1.1rem; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px;">
+                PURE BENGALI EXPERIENCE
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center; margin: 12px auto; width: 100%; max-width: 250px;">
+                <div style="flex: 1; height: 1.5px; background-color: #D4AF37;"></div>
+                <div style="width: 8px; height: 8px; background-color: #D4AF37; transform: rotate(45deg); margin: 0 10px;"></div>
+                <div style="flex: 1; height: 1.5px; background-color: #D4AF37;"></div>
+            </div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: #5a413d; font-weight: bold; letter-spacing: 0.08em; line-height: 1.5; font-family: 'Poppins', sans-serif;">
+                AUTHENTIC FOOD &bull; WARM HOSPITALITY &bull; MEMORABLE MOMENTS
+            </div>
+        </div>
+
+    </div>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase-js.js"></script>
+
+    <script>
+        const SUPABASE_URL = (window.ENV && window.ENV.SUPABASE_URL) || "";
+        const SUPABASE_KEY = (window.ENV && window.ENV.SUPABASE_KEY) || "";
+        
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+        document.getElementById("loginForm")
+            .addEventListener("submit", async function (e) {
+                console.log("Form submit event triggered");
+                e.preventDefault();
+
+                const name = document.getElementById("name").value.trim();
+                const mobile = document.getElementById("mobile").value.trim();
+                console.log("Submit inputs:", { name, mobile });
+
+                if (name.length < 3) {
+                    console.warn("Validation failed: Name length is less than 3");
+                    alert("Please enter valid name");
+                    return;
+                }
+
+                if (!/^[0-9]{10}$/.test(mobile)) {
+                    console.warn("Validation failed: Mobile number is not exactly 10 digits");
+                    alert("Enter valid 10-digit mobile number");
+                    return;
+                }
+
+                // Show submitting state on the button
+                const btn = e.target.querySelector('button');
+                const origText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = "SAVING DETAILS...";
+
+                console.log("Sending insert query to Supabase: table public.customers...");
+                try {
+                    const { data, error } = await supabaseClient
+                        .from("customers")
+                        .insert([{ name, mobile }])
+                        .select();
+
+                    console.log("Supabase response:", { data, error });
+
+                    let finalData = data;
+                    if (error) {
+                        // Handle unique constraint violation gracefully for returning users
+                        if (error.code === '23505') {
+                            console.log("Duplicate customer mobile detected (code 23505). Fetching existing customer profile...");
+                            const { data: existing, error: fetchError } = await supabaseClient
+                                .from("customers")
+                                .select()
+                                .eq("mobile", mobile)
+                                .maybeSingle();
+
+                            if (fetchError || !existing) {
+                                console.error("Failed to fetch existing customer:", fetchError);
+                                alert("Failed to save customer: " + (error.message || JSON.stringify(error)));
+                                btn.disabled = false;
+                                btn.textContent = origText;
+                                return;
+                            }
+                            console.log("Found existing customer profile:", existing);
+                            finalData = [existing];
+                        } else {
+                            console.error("Database save failed. Supabase error details:", error);
+                            alert("Failed to save customer: " + (error.message || JSON.stringify(error)));
+                            btn.disabled = false;
+                            btn.textContent = origText;
+                            return;
+                        }
+                    }
+
+                    console.log("Database authentication succeeded. Customer details:", finalData);
+
+                    const sessionPayload = {
+                        name: finalData[0].name,
+                        mobile: finalData[0].mobile,
+                        loginTime: new Date().toISOString()
+                    };
+
+                    console.log("Writing session details to localStorage...");
+                    localStorage.setItem("customerName", sessionPayload.name);
+                    localStorage.setItem("customerMobile", sessionPayload.mobile);
+                    localStorage.setItem("bh_customer_session", JSON.stringify(sessionPayload));
+
+                    console.log("LocalStorage values verified:", {
+                        customerName: localStorage.getItem("customerName"),
+                        customerMobile: localStorage.getItem("customerMobile"),
+                        bh_customer_session: localStorage.getItem("bh_customer_session")
+                    });
+
+                    // Redirect to the Menu page
+                    const targetRedirectPath = "../Menu/index.html";
+                    console.log("Firing window.location.href redirect to:", targetRedirectPath);
+                    window.location.href = targetRedirectPath;
+                } catch (err) {
+                    console.error("Caught unexpected JavaScript exception in form handler:", err);
+                    alert("Unexpected error: " + err.message);
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                }
+            });
+
+    </script>
+
+</body>
+
+</html>

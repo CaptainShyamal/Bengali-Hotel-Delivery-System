@@ -1,0 +1,153 @@
+Software Requirements Specification (SRS)
+Project Title
+Bengali Hotel Restaurant Ordering System
+Version
+1.0
+Client
+Bengali Hotel, Saidulajab, Saket, New Delhi - 110030
+1. Introduction
+1.1 Purpose
+The purpose of this system is to provide customers with an online ordering platform for Bengali Hotel Restaurant where customers can browse menu items, add products to a cart, and place orders without online payment.
+The system will automatically notify restaurant staff and management when an order is placed.
+1.2 Scope
+The website shall:
+Allow customer login using Name and Mobile Number.
+Display complete restaurant menu.
+Allow item quantity selection.
+Allow Premium Packaging selection.
+Generate unique Order IDs.
+Store customer and order history.
+Send notifications via WhatsApp and Email.
+Provide an owner dashboard with revenue analytics.
+2. User Roles
+Customer
+Can:
+Login
+Browse menu
+Add items to cart
+Place order
+View order confirmation
+Owner
+Can:
+View all orders
+View customer history
+View revenue reports
+View order analytics
+Chef
+Can:
+Receive order notifications
+View order details
+3. Functional Requirements
+FR-1 Customer Login
+Fields:
+Customer Name
+Mobile Number
+Validation:
+Mobile Number must contain exactly 10 digits
+Database:
+Save into customers table
+FR-2 Menu Management
+Categories:
+Rice Items
+Veg Thali
+Non-Veg Thali
+Paratha Combo
+Veg Main Course
+Non-Veg Main Course
+Bread
+Features:
+Add to Cart
+Increase Quantity
+Decrease Quantity
+Display Prices
+FR-3 Shopping Cart
+System shall:
+Display selected items
+Calculate subtotal
+Add packaging fee if selected
+Calculate final amount
+FR-4 Premium Packaging
+Fee:₹100
+When selected:
+Add ₹100 to total
+Store packaging status in database
+FR-5 Order Placement
+System shall:
+Generate unique Order ID
+Save order details
+Save customer information
+Save timestamp
+Save total amount
+Set status as Pending
+FR-6 Notification System
+On order placement:
+Send notification to:
+Owner WhatsApp
+Chef WhatsApp
+Owner Email
+Notification must include:
+Order ID
+Customer Name
+Mobile Number
+Ordered Items
+Quantity
+Total Amount
+Order Time
+FR-7 Order History
+Store:
+Customer Name
+Mobile Number
+Order Items
+Total Amount
+Packaging Status
+Order Date
+Order Time
+FR-8 Owner Dashboard
+Display:
+Today's Revenue
+Weekly Revenue
+Monthly Revenue
+Total Orders
+Customer History
+Recent Orders
+Charts:
+Daily Revenue
+Weekly Revenue
+Monthly Revenue
+4. Non-Functional Requirements
+Performance
+Page load time less than 3 seconds
+Security
+Input validation
+Secure API communication
+Availability
+24x7 availability
+Compatibility
+Mobile Responsive
+Desktop Responsive
+5. Technology Stack
+Frontend:
+Google Stitch Generated React App
+Backend:
+Supabase
+Database:
+PostgreSQL
+Notifications:
+Make.com
+Twilio WhatsApp API
+Email:
+Resend
+Hosting:
+Vercel
+6. Delivery Timings
+Restaurant Order Acceptance:
+3:00 PM to 12:00 Midnight
+Orders outside this timing should display:
+"Restaurant is currently closed. Orders are accepted from 3 PM to 12 Midnight."
+7. Future Enhancements
+Online Payment Gateway
+Live Order Tracking
+Coupon System
+Loyalty Program
+Android Application
+Customer Reviews

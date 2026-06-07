@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Order | Bengali Hotel Restaurant</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Modal Overlay */
+    .address-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(26, 28, 28, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .address-modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Modal Content Box */
+    .address-modal-content {
+      background-color: var(--color-surface-cream);
+      border: 2px solid var(--color-gold);
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 480px;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    .address-modal-overlay.active .address-modal-content {
+      transform: scale(1);
+    }
+
+    /* Close Button */
+    .address-modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: color 0.2s ease;
+      line-height: 1;
+    }
+
+    .address-modal-close:hover {
+      color: var(--color-primary-maroon);
+    }
+
+    /* Title styling */
+    .address-modal-content h3 {
+      font-family: var(--font-serif);
+      color: var(--color-primary-dark);
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Input styling */
+    .address-input-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .address-input-row .address-input-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .address-input-group {
+      margin-bottom: 15px;
+      position: relative;
+      width: 100%;
+    }
+
+    .address-input-group input,
+    .address-input-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border-light);
+      border-radius: 8px;
+      background-color: var(--color-surface-white);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      color: var(--color-text-dark);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .address-input-group input:focus,
+    .address-input-group textarea:focus {
+      border-color: var(--color-primary-maroon);
+      box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.08);
+    }
+
+    .address-input-group textarea {
+      resize: vertical;
+    }
+
+    /* --- Responsive Overrides --- */
+    @media (max-width: 768px) {
+      .receipt-container {
+        padding: 20px 15px !important;
+        margin: 20px auto !important;
+      }
+      .receipt-title {
+        font-size: 1.6rem !important;
+      }
+      .receipt-meta-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+    }
+
+    @media (max-width: 500px) {
+      /* Hide unit price column to maximize space on tiny screens */
+      .receipt-items-table th:nth-child(3),
+      .receipt-items-table td:nth-child(3) {
+        display: none !important;
+      }
+      .receipt-items-table th, 
+      .receipt-items-table td {
+        font-size: 0.85rem !important;
+      }
+      .receipt-items-table td:first-child {
+        font-size: 0.95rem !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .receipt-actions-wrapper {
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+      .receipt-actions-wrapper button {
+        width: 100% !important;
+        flex: none !important;
+      }
+      .address-input-row {
+        flex-direction: column !important;
+        gap: 15px !important;
+      }
+      .address-modal-content {
+        padding: 20px !important;
+        border-radius: 12px !important;
+      }
+      .address-modal-content h3 {
+        font-size: 1.25rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header>
+    <div class="container header-container">
+      <div onclick="window.location.href='../index.html'" style="cursor:pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.2s ease, opacity 0.2s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.opacity='0.95';" onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';">
+        <img src="../login/logo.png?v=1.3" alt="Bengali Hotel Logo" style="height: 45px; width: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-gold); box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);">
+        <h1 style="font-size: 1.8rem; margin: 0; color: var(--color-surface-white);">Bengali <span style="color: var(--color-gold);">Hotel</span></h1>
+      </div>
+      <nav class="nav-links">
+        <a href="../Menu/index.html" class="nav-link">Back to Menu</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="receipt-container">
+      <h2 class="receipt-title">Review Your Order</h2>
+      <p class="receipt-subtitle">Bengali Hotel, Saidulajab, Saket</p>
+
+      <!-- Customer Details Section -->
+      <div class="receipt-section">
+        <h3 style="font-size: 1rem; text-transform: uppercase; color: var(--color-gold-hover); margin-bottom: 12px; letter-spacing: 0.05em;">Dining Guest Details</h3>
+        <div class="receipt-meta-grid">
+          <div>
+            <span style="color: var(--color-text-muted); font-size: 0.85rem; display: block;">Customer Name</span>
+            <strong id="display-cust-name" style="font-size: 1.1rem; color: var(--color-primary-dark);">John Doe</strong>
+          </div>
+          <div>
+            <span style="color: var(--color-text-muted); font-size: 0.85rem; display: block;">Mobile Number</span>
+            <strong id="display-cust-mobile" style="font-size: 1.1rem; color: var(--color-primary-dark);">9876543210</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Details Section -->
+      <div class="receipt-section">
+        <h3 style="font-size: 1rem; text-transform: uppercase; color: var(--color-gold-hover); margin-bottom: 12px; letter-spacing: 0.05em;">Ordered Dishes</h3>
+        <table class="receipt-items-table">
+          <thead>
+            <tr>
+              <th>Dish Name</th>
+              <th style="text-align: center; width: 80px;">Qty</th>
+              <th class="amount" style="width: 100px;">Price</th>
+              <th class="amount" style="width: 120px;">Total</th>
+            </tr>
+          </thead>
+          <tbody id="receipt-items-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Financial Totals Section -->
+      <div class="receipt-section" style="padding-bottom: 0;">
+        <div class="cart-summary-row" style="font-size: 1rem;">
+          <span>Subtotal</span>
+          <span id="receipt-subtotal">₹0</span>
+        </div>
+        <div class="cart-summary-row" id="receipt-packaging-row" style="display: none; font-size: 1rem;">
+          <span>Premium Packaging Fee</span>
+          <span>₹100</span>
+        </div>
+        
+        <div class="receipt-total-row">
+          <span>Amount Payable</span>
+          <span id="receipt-total">₹0</span>
+        </div>
+        <div style="margin-top: 10px; text-align: right;">
+          <p style="font-size: 0.8rem; color: var(--color-text-muted); font-style: italic;">
+            * Cash on Delivery / Pay at Restaurant. No online payment required.
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="receipt-actions-wrapper" style="margin-top: 40px; display: flex; gap: 15px;">
+        <button class="btn btn-secondary" onclick="window.location.href='../Menu/index.html'" style="flex: 1;">
+          Modify Items
+        </button>
+        <button class="btn btn-primary" id="btn-place-order" style="flex: 1.5;">
+          Confirm &amp; Place Order
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="../Menu/index.html">Our Menu</a></li>
+            <li><a href="#">Service</a></li>
+            <li><a href="#">Reservation</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Contact</h3>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span class="footer-contact-text">Saidulajab, Saket, New Delhi - 110030</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+            <span class="footer-contact-text">+91 9911796021</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+            <span class="footer-contact-text">bengalihotel.com</span>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h3>Opening Hours</h3>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Monday - Sunday</div>
+            <div class="footer-hours-val">12:30 PM - 2:00 AM</div>
+          </div>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Free Home Delivery</div>
+            <div class="footer-hours-val">Order Above Rs. 199</div>
+            <div class="footer-hours-val" style="font-size: 0.8rem; color: var(--color-gold); margin-top: 2px;">(Free delivery upto 1 km only)</div>
+          </div>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Delivery Timings</div>
+            <div class="footer-hours-val">1:00 PM - 11:00 PM</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">
+          &copy; 2026 Bengali Hotel. All rights reserved. Developed by <a href="https://portfolio-shyamal-3s.vercel.app/" target="_blank">Shyamal Jana</a>
+        </div>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com/bengali.dhaba.3?mibextid=wwXIfr&rdid=2FfXTDLW8JQO5E12&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1ANrrqQkR9%2F%3Fmibextid%3DwwXIfr#" target="_blank" class="footer-social-btn" aria-label="Facebook">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/bengalihotelsaket" target="_blank" class="footer-social-btn" aria-label="Instagram">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Delivery Address Modal -->
+  <div id="address-modal" class="address-modal-overlay">
+    <div class="address-modal-content" style="max-height: 90vh; overflow-y: auto;">
+      <span class="address-modal-close" id="btn-close-address-modal">&times;</span>
+      <h3>📍 Delivery Address</h3>
+      <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 15px;">Please enter your delivery details to complete your order.</p>
+      
+      <!-- Disclaimer notice -->
+      <div style="background-color: #FFF9E6; border-left: 4px solid #D4AF37; padding: 10px 12px; margin-bottom: 15px; font-size: 0.78rem; color: #570000; line-height: 1.4; border-radius: 4px;">
+        ⚠️ <b>Verify Details:</b> Please ensure the Receiver's Name and Mobile Number are accurate. Delivery staff will use this number to contact you and confirm payment upon arrival.
+      </div>
+
+      <form id="address-form">
+        <!-- Receiver's Details Section -->
+        <div class="address-input-row">
+          <div class="address-input-group">
+            <input type="text" id="receiverName" placeholder="Receiver's Full Name" required>
+          </div>
+          <div class="address-input-group">
+            <input type="tel" id="receiverMobile" placeholder="Receiver's Mobile (10-Digit)" pattern="[0-9]{10}" title="Enter 10-digit mobile number" required>
+          </div>
+        </div>
+
+        <div class="address-input-row">
+          <div class="address-input-group">
+            <input type="text" id="flatNumber" placeholder="Flat / House Number" required>
+          </div>
+          <div class="address-input-group">
+            <input type="text" id="street" placeholder="Street / Road Name" required>
+          </div>
+        </div>
+        
+        <div class="address-input-row">
+          <div class="address-input-group" style="flex: 2;">
+            <input type="text" id="area" placeholder="Area / Locality" required>
+          </div>
+          <div class="address-input-group" style="flex: 1;">
+            <input type="text" id="pincode" placeholder="Pincode (6-Digit)" pattern="[0-9]{6}" title="Enter 6-digit postal code" required>
+          </div>
+        </div>
+        
+        <div class="address-input-row">
+          <div class="address-input-group">
+            <input type="text" id="city" placeholder="City" required>
+          </div>
+          <div class="address-input-group">
+            <input type="text" id="state" placeholder="State" required>
+          </div>
+        </div>
+        
+        <div class="address-input-group">
+          <textarea id="landmark" placeholder="Nearby Landmark" rows="2" required></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
+          Confirm Order
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase-js.js"></script>
+  <script src="../js/supabase.js?v=1.2"></script>
+  <script>
+    let cart = [];
+    let customer = null;
+    let isPackagingEnabled = false;
+    let totalAmount = 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Check Login Session
+      if (!SessionManager.isLoggedIn()) {
+        window.location.href = '../login/log.html';
+        return;
+      }
+      customer = SessionManager.getCurrentCustomer();
+      document.getElementById('display-cust-name').textContent = customer.name;
+      document.getElementById('display-cust-mobile').textContent = customer.mobile;
+
+      // 2. Load Cart
+      const savedCart = localStorage.getItem('bh_shopping_cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+      }
+      
+      if (cart.length === 0) {
+        window.location.href = '../Menu/index.html';
+        return;
+      }
+
+      isPackagingEnabled = localStorage.getItem('bh_premium_packaging') === 'true';
+
+      renderReceipt();
+    });
+
+    function renderReceipt() {
+      const tbody = document.getElementById('receipt-items-body');
+      tbody.innerHTML = '';
+
+      let subtotal = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family: var(--font-serif); font-weight: 600; color: var(--color-primary-dark); font-size: 1.05rem;">${item.name}</td>
+          <td style="text-align: center;">${item.qty}</td>
+          <td class="amount">₹${item.price}</td>
+          <td class="amount">₹${itemTotal}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Update calculations
+      document.getElementById('receipt-subtotal').textContent = `₹${subtotal}`;
+      
+      const packagingFee = isPackagingEnabled ? 100 : 0;
+      if (isPackagingEnabled) {
+        document.getElementById('receipt-packaging-row').style.display = 'flex';
+      } else {
+        document.getElementById('receipt-packaging-row').style.display = 'none';
+      }
+
+      totalAmount = subtotal + packagingFee;
+      document.getElementById('receipt-total').textContent = `₹${totalAmount}`;
+    }
+
+    // Place Order Action (Opens Address Modal)
+    const btnPlaceOrder = document.getElementById('btn-place-order');
+    const addressModal = document.getElementById('address-modal');
+    const btnCloseAddressModal = document.getElementById('btn-close-address-modal');
+    const addressForm = document.getElementById('address-form');
+
+    btnPlaceOrder.addEventListener('click', () => {
+      addressModal.style.display = 'flex';
+      setTimeout(() => addressModal.classList.add('active'), 10);
+    });
+
+    const closeModal = () => {
+      addressModal.classList.remove('active');
+      setTimeout(() => addressModal.style.display = 'none', 300);
+    };
+
+    btnCloseAddressModal.addEventListener('click', closeModal);
+    
+    // Close modal if user clicks outside of the modal content
+    addressModal.addEventListener('click', (e) => {
+      if (e.target === addressModal) {
+        closeModal();
+      }
+    });
+
+    addressForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const receiverName = document.getElementById('receiverName').value.trim();
+      const receiverMobile = document.getElementById('receiverMobile').value.trim();
+      const flatNumber = document.getElementById('flatNumber').value.trim();
+      const street = document.getElementById('street').value.trim();
+      const area = document.getElementById('area').value.trim();
+      const pincode = document.getElementById('pincode').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const state = document.getElementById('state').value.trim();
+      const landmark = document.getElementById('landmark').value.trim();
+
+      const fullAddress = `Receiver: ${receiverName} (${receiverMobile}), Address: ${flatNumber}, ${street}, ${area}, ${city}, ${state} - ${pincode} (Landmark: ${landmark})`;
+
+      const addressData = {
+        receiver_name: receiverName,
+        receiver_mobile: receiverMobile,
+        flat_number: flatNumber,
+        street: street,
+        area: area,
+        pincode: pincode,
+        city: city,
+        state: state,
+        landmark: landmark,
+        full_address: fullAddress
+      };
+
+      // Disable buttons to prevent double submission
+      const submitBtn = addressForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting Order...';
+      btnPlaceOrder.disabled = true;
+
+      try {
+        const { data, shortOrderId, error } = await OrderManager.placeOrder(
+          customer.name,
+          customer.mobile,
+          cart,
+          totalAmount,
+          isPackagingEnabled,
+          addressData
+        );
+
+        if (error) {
+          Toast.show(`Failed to place order: ${error}`, true);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Confirm Order';
+          btnPlaceOrder.disabled = false;
+        } else {
+          // Clear Cart from LocalStorage
+          localStorage.removeItem('bh_shopping_cart');
+          localStorage.removeItem('bh_premium_packaging');
+
+          // Save placed order info for Thank You page to read
+          const confirmationInfo = {
+            orderId: shortOrderId,
+            customerName: customer.name,
+            totalAmount: totalAmount,
+            items: cart,
+            address: addressData,
+            createdAt: data.created_at
+          };
+          localStorage.setItem('bh_last_order_confirmation', JSON.stringify(confirmationInfo));
+          localStorage.setItem('lastOrder', JSON.stringify(confirmationInfo));
+
+          Toast.show('Order placed successfully! Redirecting...');
+          
+          setTimeout(() => {
+            window.location.href = '../thankyoupage/index.html';
+          }, 1200);
+        }
+      } catch (err) {
+        console.error(err);
+        Toast.show('Something went wrong. Please try again.', true);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm Order';
+        btnPlaceOrder.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

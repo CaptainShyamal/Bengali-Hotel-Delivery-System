@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 Admin Login 👑 | Bengali Hotel</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    :root {
+      --color-primary-maroon: #800000;
+      --color-primary-dark: #570000;
+      --color-gold: #D4AF37;
+      --color-surface-white: #ffffff;
+      --color-surface-cream: #F8F5F2;
+      --color-text-dark: #1A1A1A;
+      --color-text-muted: #5a413d;
+      --color-border-light: #EEEEEE;
+    }
+
+    body {
+      background-color: var(--color-surface-cream) !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      font-family: var(--font-sans), sans-serif;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      background: var(--color-surface-white);
+      border: 1px solid var(--color-border-light);
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+      border-radius: 16px !important;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        width: 92%;
+        padding: 30px 20px;
+      }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header h2 {
+      font-family: var(--font-serif);
+      color: var(--color-primary-maroon);
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+
+    .login-header p {
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+
+    .admin-input-group {
+      margin-bottom: 24px;
+      position: relative;
+      text-align: left;
+    }
+
+    /* Force label static block positioning to override global css absolute positioning */
+    .admin-input-group label {
+      position: static !important;
+      display: block !important;
+      font-size: 0.85rem !important;
+      font-weight: 700 !important;
+      margin-bottom: 8px !important;
+      color: var(--color-text-muted) !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      pointer-events: auto !important;
+      transform: none !important;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .admin-input-group input {
+      width: 100%;
+      height: 54px;
+      padding: 0 16px;
+      border: 1px solid #D0D0D0 !important;
+      background: #FFFFFF !important;
+      font-size: 1rem;
+      outline: none;
+      border-radius: 10px !important;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      color: var(--color-text-dark);
+      box-sizing: border-box;
+    }
+
+    .admin-input-group input#password {
+      padding-right: 48px;
+    }
+
+    .admin-input-group input:focus {
+      border-color: var(--color-primary-maroon) !important;
+      box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.1);
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      width: 24px;
+      height: 24px;
+      z-index: 10;
+    }
+
+    .toggle-password svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -8px;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+    }
+
+    .forgot-password-link {
+      color: var(--color-primary-maroon);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-password-link:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .btn {
+      width: 100%;
+      height: 54px;
+      background: var(--color-primary-maroon);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-radius: 10px !important;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      background: var(--color-primary-dark);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      background: #cccccc !important;
+      cursor: not-allowed !important;
+    }
+
+    .gold-divider {
+      height: 2px;
+      background: var(--color-gold);
+      margin: 15px auto;
+      width: 60px;
+    }
+
+    /* Top Left Logo styles */
+    .top-left-logo {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 8px 16px;
+      border-radius: 50px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .top-left-logo:hover {
+      transform: scale(1.03);
+      opacity: 0.95;
+    }
+
+    .top-left-logo img {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--color-gold);
+      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+    }
+
+    .top-left-logo span {
+      font-family: var(--font-serif), Georgia, serif;
+      font-weight: 700;
+      color: var(--color-primary-maroon);
+      font-size: 1.25rem;
+      letter-spacing: 0.02em;
+    }
+
+    .top-left-logo span span {
+      color: var(--color-gold);
+    }
+
+    @media (max-width: 768px) {
+      .top-left-logo {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+      }
+
+      .top-left-logo:hover {
+        transform: translateX(-50%) scale(1.03);
+      }
+
+      body {
+        padding-top: 90px !important;
+      }
+    }
+
+    /* Recovery Modal Overlay */
+    .recovery-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(26, 28, 28, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .recovery-modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .recovery-modal-content {
+      background-color: var(--color-surface-white);
+      border: 2px solid var(--color-gold);
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+      text-align: left;
+    }
+
+    .recovery-modal-overlay.active .recovery-modal-content {
+      transform: scale(1);
+    }
+
+    .recovery-modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      transition: color 0.2s ease;
+      line-height: 1;
+    }
+
+    .recovery-modal-close:hover {
+      color: var(--color-primary-maroon);
+    }
+
+    .recovery-modal-content h3 {
+      font-family: var(--font-serif);
+      color: var(--color-primary-dark);
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      margin-top: 0;
+    }
+
+    .recovery-step {
+      display: none;
+    }
+
+    .recovery-step.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-left-logo" onclick="window.location.href='../index.html'">
+    <img src="../login/logo.png?v=1.3" alt="Bengali Hotel Logo">
+    <span>Bengali <span>Hotel</span></span>
+  </div>
+
+  <div class="login-container">
+    <div class="login-header">
+      <h2>Bengali Hotel</h2>
+      <p>👑 Admin Dashboard Access 👑</p>
+      <div class="gold-divider"></div>
+    </div>
+
+    <!-- Credentials Entry Screen -->
+    <div id="screen-credentials">
+      <form id="form-credentials">
+        <div class="admin-input-group">
+          <label for="username">Admin Username</label>
+          <div class="input-wrapper">
+            <input type="text" id="username" placeholder="Enter username" required autocomplete="username">
+          </div>
+        </div>
+        <div class="admin-input-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+            <button type="button" class="toggle-password" id="togglePasswordBtn" title="Toggle password visibility">
+              <svg id="eye-icon" viewBox="0 0 24 24">
+                <path
+                  d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <a href="#" class="forgot-password-link" id="forgotPasswordBtn">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="btn" id="btn-login-submit">Authenticate</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Recovery Modal -->
+  <div id="recovery-modal" class="recovery-modal-overlay">
+    <div class="recovery-modal-content">
+      <span class="recovery-modal-close" id="btn-close-recovery-modal">&times;</span>
+      <h3>🔑 Reset Password</h3>
+      <div class="gold-divider" style="margin: 10px 0 20px 0;"></div>
+      
+      <!-- Step 1: Request Username -->
+      <div id="recovery-step-1" class="recovery-step active">
+        <p style="font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 20px;">
+          Enter your admin username to receive a 6-digit security OTP code at your registered email address.
+        </p>
+        <div class="admin-input-group">
+          <label for="recovery-username">Username</label>
+          <div class="input-wrapper">
+            <input type="text" id="recovery-username" placeholder="Enter username" required style="width:100%; height:48px; box-sizing:border-box; padding:0 12px; border:1px solid #D0D0D0; border-radius:8px;">
+          </div>
+        </div>
+        <button type="button" class="btn" id="btn-recovery-send-otp" style="height:48px; margin-top: 10px;">Send OTP Code</button>
+      </div>
+
+      <!-- Step 2: Verify OTP -->
+      <div id="recovery-step-2" class="recovery-step">
+        <p style="font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 15px;" id="otp-destination-text">
+          A verification OTP has been sent.
+        </p>
+        <div class="admin-input-group">
+          <label for="recovery-otp">Enter 6-Digit OTP</label>
+          <div class="input-wrapper">
+            <input type="text" id="recovery-otp" placeholder="XXXXXX" maxlength="6" pattern="[0-9]{6}" required style="width:100%; height:48px; box-sizing:border-box; padding:0 12px; border:1px solid #D0D0D0; border-radius:8px; text-align:center; font-size:1.2rem; letter-spacing:0.3em;">
+          </div>
+        </div>
+        <button type="button" class="btn" id="btn-recovery-verify-otp" style="height:48px; margin-top: 10px;">Verify Code</button>
+        <div style="text-align: center; margin-top: 15px;">
+          <a href="#" id="btn-recovery-resend" style="font-size: 0.8rem; color: var(--color-primary-maroon); text-decoration: none; font-weight: bold;">Resend OTP</a>
+        </div>
+      </div>
+
+      <!-- Step 3: Enter New Password -->
+      <div id="recovery-step-3" class="recovery-step">
+        <p style="font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 20px;">
+          Your OTP code has been verified. Please enter your new admin access password.
+        </p>
+        <div class="admin-input-group" style="margin-bottom:15px;">
+          <label for="recovery-new-password">New Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="recovery-new-password" placeholder="Enter new password" required style="width:100%; height:48px; box-sizing:border-box; padding:0 12px; border:1px solid #D0D0D0; border-radius:8px;">
+          </div>
+        </div>
+        <div class="admin-input-group" style="margin-bottom:20px;">
+          <label for="recovery-confirm-password">Confirm Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="recovery-confirm-password" placeholder="Confirm new password" required style="width:100%; height:48px; box-sizing:border-box; padding:0 12px; border:1px solid #D0D0D0; border-radius:8px;">
+          </div>
+        </div>
+        <button type="button" class="btn" id="btn-recovery-reset-password" style="height:48px;">Update Password</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase-js.js"></script>
+  <script src="../js/supabase.js?v=1.2"></script>
+  <script>
+    const formCreds = document.getElementById('form-credentials');
+    const btnCreds = document.getElementById('btn-login-submit');
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+
+    // Toggle Password Visibility
+    togglePasswordBtn.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+
+      if (type === 'password') {
+        eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+      } else {
+        // Eye-slash / closed icon
+        eyeIcon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.17c0-1.66-1.34-3-3-3l-.17.02z"/>';
+      }
+    });
+
+    // Forgot Password action
+    const recoveryModal = document.getElementById('recovery-modal');
+    const closeRecoveryBtn = document.getElementById('btn-close-recovery-modal');
+    
+    const recStep1 = document.getElementById('recovery-step-1');
+    const recStep2 = document.getElementById('recovery-step-2');
+    const recStep3 = document.getElementById('recovery-step-3');
+    
+    const btnSendOtp = document.getElementById('btn-recovery-send-otp');
+    const btnVerifyOtp = document.getElementById('btn-recovery-verify-otp');
+    const btnResetPassword = document.getElementById('btn-recovery-reset-password');
+    const btnResendOtp = document.getElementById('btn-recovery-resend');
+    
+    let recoveredAdmin = null;
+    let generatedOtpCode = null;
+
+    function resetRecoverySteps() {
+      recStep1.classList.add('active');
+      recStep2.classList.remove('active');
+      recStep3.classList.remove('active');
+      document.getElementById('recovery-username').value = '';
+      document.getElementById('recovery-otp').value = '';
+      document.getElementById('recovery-new-password').value = '';
+      document.getElementById('recovery-confirm-password').value = '';
+      recoveredAdmin = null;
+      generatedOtpCode = null;
+      btnSendOtp.disabled = false;
+      btnSendOtp.textContent = 'Send OTP Code';
+      btnVerifyOtp.disabled = false;
+      btnVerifyOtp.textContent = 'Verify Code';
+      btnResetPassword.disabled = false;
+      btnResetPassword.textContent = 'Update Password';
+    }
+
+    forgotPasswordBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      resetRecoverySteps();
+      recoveryModal.style.display = 'flex';
+      setTimeout(() => recoveryModal.classList.add('active'), 10);
+    });
+
+    const closeRecoveryModal = () => {
+      recoveryModal.classList.remove('active');
+      setTimeout(() => recoveryModal.style.display = 'none', 300);
+    };
+
+    closeRecoveryBtn.addEventListener('click', closeRecoveryModal);
+    recoveryModal.addEventListener('click', (e) => {
+      if (e.target === recoveryModal) {
+        closeRecoveryModal();
+      }
+    });
+
+    function maskEmail(email) {
+      if (!email || !email.includes('@')) return 'your registered email';
+      const [local, domain] = email.split('@');
+      if (local.length <= 2) {
+        return local[0] + '***@' + domain;
+      }
+      return local[0] + '***' + local[local.length - 1] + '@' + domain;
+    }
+
+    // Step 1: Send OTP code
+    btnSendOtp.addEventListener('click', async () => {
+      const username = document.getElementById('recovery-username').value.trim();
+      if (!username) {
+        alert('Please enter your username.');
+        return;
+      }
+
+      btnSendOtp.disabled = true;
+      btnSendOtp.textContent = 'Processing...';
+
+      try {
+        const { data: admin, error } = await window.supabaseClient
+          .from('admins')
+          .select('*')
+          .eq('username', username)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!admin) {
+          alert('Username not found.');
+          btnSendOtp.disabled = false;
+          btnSendOtp.textContent = 'Send OTP Code';
+          return;
+        }
+
+        recoveredAdmin = admin;
+        // Generate 6-digit OTP
+        generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 mins expiry
+
+        // Insert into otp_logs
+        const { error: otpError } = await window.supabaseClient
+          .from('otp_logs')
+          .insert([{
+            admin_id: admin.id,
+            otp_code: generatedOtpCode,
+            expires_at: expiresAt,
+            verified: false
+          }]);
+
+        if (otpError) throw otpError;
+
+        // Move to Step 2
+        document.getElementById('otp-destination-text').innerHTML = `
+          A 6-digit verification OTP has been logged in the security logs. Please check your database <strong>otp_logs</strong> table to retrieve and enter the code below.
+        `;
+        recStep1.classList.remove('active');
+        recStep2.classList.add('active');
+
+      } catch (err) {
+        console.error('OTP Send error:', err);
+        alert('Failed to send OTP code. Please try again. Error: ' + err.message);
+        btnSendOtp.disabled = false;
+        btnSendOtp.textContent = 'Send OTP Code';
+      }
+    });
+
+    // Resend OTP handler
+    btnResendOtp.addEventListener('click', (e) => {
+      e.preventDefault();
+      recStep2.classList.remove('active');
+      recStep1.classList.add('active');
+      btnSendOtp.disabled = false;
+      btnSendOtp.textContent = 'Send OTP Code';
+    });
+
+    // Step 2: Verify OTP
+    btnVerifyOtp.addEventListener('click', async () => {
+      const enteredOtp = document.getElementById('recovery-otp').value.trim();
+      if (!enteredOtp || enteredOtp.length !== 6) {
+        alert('Please enter a valid 6-digit OTP code.');
+        return;
+      }
+
+      btnVerifyOtp.disabled = true;
+      btnVerifyOtp.textContent = 'Verifying...';
+
+      try {
+        const { data: log, error } = await window.supabaseClient
+          .from('otp_logs')
+          .select('*')
+          .eq('admin_id', recoveredAdmin.id)
+          .eq('otp_code', enteredOtp)
+          .eq('verified', false)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!log) {
+          alert('Invalid OTP code. Please check and try again.');
+          btnVerifyOtp.disabled = false;
+          btnVerifyOtp.textContent = 'Verify Code';
+          return;
+        }
+
+        // Check expiry
+        let expiresAtStr = log.expires_at;
+        if (expiresAtStr && typeof expiresAtStr === 'string' && !expiresAtStr.endsWith('Z') && !expiresAtStr.includes('+')) {
+          expiresAtStr += 'Z';
+        }
+        const now = new Date();
+        const expiresAtDate = new Date(expiresAtStr);
+        if (now > expiresAtDate) {
+          alert('This OTP code has expired. Please request a new one.');
+          btnVerifyOtp.disabled = false;
+          btnVerifyOtp.textContent = 'Verify Code';
+          return;
+        }
+
+        // Mark OTP as verified
+        const { error: verifyError } = await window.supabaseClient
+          .from('otp_logs')
+          .update({ verified: true })
+          .eq('id', log.id);
+
+        if (verifyError) throw verifyError;
+
+        // Move to Step 3
+        recStep2.classList.remove('active');
+        recStep3.classList.add('active');
+
+      } catch (err) {
+        console.error('OTP Verify error:', err);
+        alert('Verification failed. Error: ' + err.message);
+        btnVerifyOtp.disabled = false;
+        btnVerifyOtp.textContent = 'Verify Code';
+      }
+    });
+
+    // Step 3: Reset Password
+    btnResetPassword.addEventListener('click', async () => {
+      const newPassword = document.getElementById('recovery-new-password').value;
+      const confirmPassword = document.getElementById('recovery-confirm-password').value;
+
+      if (!newPassword) {
+        alert('Please enter your new password.');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        alert('Passwords do not match. Please verify.');
+        return;
+      }
+
+      btnResetPassword.disabled = true;
+      btnResetPassword.textContent = 'Updating...';
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('admins')
+          .update({ password: newPassword })
+          .eq('id', recoveredAdmin.id);
+
+        if (error) throw error;
+
+        alert('Password updated successfully! You can now log in with your new password.');
+        closeRecoveryModal();
+      } catch (err) {
+        console.error('Password reset error:', err);
+        alert('Failed to update password. Error: ' + err.message);
+        btnResetPassword.disabled = false;
+        btnResetPassword.textContent = 'Update Password';
+      }
+    });
+
+    // Credentials Submit
+    formCreds.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!window.supabaseClient) {
+        alert('Supabase client is not loaded. Please refresh.');
+        return;
+      }
+
+      btnCreds.disabled = true;
+      btnCreds.textContent = 'Verifying...';
+
+      try {
+        // Query admins table
+        const { data: admin, error } = await window.supabaseClient
+          .from('admins')
+          .select('*')
+          .eq('username', username)
+          .eq('password', password)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Database query error:', error);
+          alert('Database connection error: ' + error.message);
+          btnCreds.disabled = false;
+          btnCreds.textContent = 'Authenticate';
+          return;
+        }
+
+        if (!admin) {
+          alert('Invalid admin credentials. Please try again.');
+          btnCreds.disabled = false;
+          btnCreds.textContent = 'Authenticate';
+          return;
+        }
+
+        // Generate session token directly on matching credentials
+        const token = (crypto.randomUUID && crypto.randomUUID()) || Math.random().toString(36).substring(2) + Date.now().toString(36);
+        const lastActivity = new Date().toISOString();
+
+        // Create a record in admin_sessions
+        const { error: sessionError } = await window.supabaseClient
+          .from('admin_sessions')
+          .insert([{
+            admin_id: admin.id,
+            session_token: token,
+            last_activity: lastActivity
+          }]);
+
+        if (sessionError) {
+          console.error('Session record insertion failed:', sessionError);
+          alert('Failed to establish session: ' + sessionError.message);
+          btnCreds.disabled = false;
+          btnCreds.textContent = 'Authenticate';
+          return;
+        }
+
+        // Save session token in localStorage
+        localStorage.setItem('bh_admin_token', token);
+        localStorage.setItem('bh_admin_id', admin.id);
+
+        // Redirect to dashboard/index.html
+        window.location.href = 'index.html';
+
+      } catch (err) {
+        console.error('Form execution error:', err);
+        alert('Unexpected error occurred: ' + err.message);
+        btnCreds.disabled = false;
+        btnCreds.textContent = 'Authenticate';
+      }
+    });
+  </script>
+</body>
+
+</html>

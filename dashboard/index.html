@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 Admin Dashboard 👑 | Bengali Hotel</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase-js.js"></script>
+  <script src="../js/supabase.js?v=1.2"></script>
+  <script>
+    // Guard route immediately before page rendering
+    (async function() {
+      const token = localStorage.getItem('bh_admin_token');
+      const adminId = localStorage.getItem('bh_admin_id');
+      if (!token || !adminId) {
+        window.location.replace('login.html');
+        return;
+      }
+      
+      const checkClient = setInterval(async () => {
+        if (window.supabaseClient) {
+          clearInterval(checkClient);
+          try {
+            const { data: session, error } = await window.supabaseClient
+              .from('admin_sessions')
+              .select('*')
+              .eq('session_token', token)
+              .eq('admin_id', adminId)
+              .maybeSingle();
+              
+            if (error || !session) {
+              logoutLocal();
+              return;
+            }
+            
+            // Validate 30 minutes expiry
+            let lastActStr = session.last_activity;
+            if (lastActStr && !lastActStr.endsWith('Z') && !lastActStr.includes('+')) {
+              lastActStr += 'Z';
+            }
+            const lastAct = new Date(lastActStr);
+            const diffMins = (new Date() - lastAct) / (1000 * 60);
+            if (diffMins > 30) {
+              await window.supabaseClient.from('admin_sessions').delete().eq('id', session.id);
+              alert('Session expired due to inactivity. Please log in again.');
+              logoutLocal();
+              return;
+            }
+            
+            // Touch database last_activity
+            await window.supabaseClient
+              .from('admin_sessions')
+              .update({ last_activity: new Date().toISOString() })
+              .eq('id', session.id);
+              
+            // Show page
+            document.documentElement.style.display = 'block';
+          } catch (err) {
+            logoutLocal();
+          }
+        }
+      }, 50);
+
+      function logoutLocal() {
+        localStorage.removeItem('bh_admin_token');
+        localStorage.removeItem('bh_admin_id');
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+  <style>
+    /* Hide page content until authenticated */
+    html {
+      display: none;
+    }
+
+    /* Re-Authentication Modal Overlay */
+    .auth-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(26, 28, 28, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .auth-modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .auth-modal-content {
+      background-color: var(--color-surface-white);
+      border: 2px solid var(--color-gold);
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .auth-modal-overlay.active .auth-modal-content {
+      transform: scale(1);
+    }
+
+    /* --- Responsive Overrides --- */
+    @media (max-width: 768px) {
+      .admin-brand-header {
+        flex-direction: column !important;
+        gap: 6px !important;
+        text-align: center !important;
+        align-items: center !important;
+      }
+      .admin-panel-badge {
+        margin-left: 0 !important;
+        display: inline-block !important;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .chart-header-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .chart-header-row .btn-group {
+        width: 100% !important;
+        display: flex !important;
+        gap: 5px !important;
+      }
+      .chart-header-row .btn-group button {
+        flex: 1 !important;
+        padding: 6px 4px !important;
+        font-size: 0.7rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header>
+    <div class="container header-container">
+      <div onclick="window.location.href='../index.html'" style="cursor:pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.2s ease, opacity 0.2s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.opacity='0.95';" onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';">
+        <img src="../login/logo.png?v=1.3" alt="Bengali Hotel Logo" style="height: 45px; width: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-gold); box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);">
+        <h1 class="admin-brand-header" style="font-size: 1.8rem; margin: 0; color: var(--color-surface-white); display: flex; align-items: center; gap: 8px;">
+          Bengali <span style="color: var(--color-gold);">Hotel</span>
+          <span class="admin-panel-badge" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; background-color: var(--color-gold); color: var(--color-primary-dark); padding: 4px 8px; border-radius: 4px; margin-left: 8px;">👑 Admin Panel 👑</span>
+        </h1>
+      </div>
+      <nav class="nav-links">
+        <a href="../Menu/index.html" class="nav-link">Customer Menu</a>
+        <a href="#" class="nav-link" id="btn-refresh">Refresh Data</a>
+        <a href="#" class="nav-link" id="btn-logout" style="color: var(--color-gold);">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container" style="margin-top: 40px;">
+    <!-- Metric Dashboard Grid -->
+    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important; gap: 20px;">
+      <div class="metric-card">
+        <div class="metric-title">Total Revenue</div>
+        <div class="metric-value" id="val-total-revenue">₹0</div>
+        <div class="metric-change">All-time earnings</div>
+      </div>
+      <div class="metric-card gold-border">
+        <div class="metric-title" id="title-revenue-today">Today's Revenue</div>
+        <div class="metric-value" id="val-revenue-today">₹0</div>
+        <div class="metric-change" id="text-revenue-today-date">Sales for today</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Today's Orders</div>
+        <div class="metric-value" id="val-orders-today">0</div>
+        <div class="metric-change">Placed today</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Pending Orders</div>
+        <div class="metric-value" id="val-orders-pending">0</div>
+        <div class="metric-change">Awaiting action</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Completed Orders</div>
+        <div class="metric-value" id="val-orders-completed">0</div>
+        <div class="metric-change">Delivered successfully</div>
+      </div>
+      <div class="metric-card gold-border">
+        <div class="metric-title">Customer Count</div>
+        <div class="metric-value" id="val-customer-count">0</div>
+        <div class="metric-change">Registered diners</div>
+      </div>
+    </div>
+
+    <!-- Analytics Charts & Settings Section -->
+    <div class="dashboard-sections">
+      <!-- Revenue Chart Analytics -->
+      <div class="dashboard-panel">
+        <div class="chart-header-row" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px; margin-bottom: 20px;">
+          <h3 style="margin-bottom: 0;">Revenue Analytics</h3>
+          <div class="btn-group" style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary active-tab-btn" id="btn-chart-daily" style="padding: 6px 12px; font-size: 0.75rem;">Daily</button>
+            <button class="btn btn-secondary" id="btn-chart-weekly" style="padding: 6px 12px; font-size: 0.75rem;">Weekly</button>
+            <button class="btn btn-secondary" id="btn-chart-monthly" style="padding: 6px 12px; font-size: 0.75rem;">Monthly</button>
+          </div>
+        </div>
+        
+        <div class="chart-container">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Settings Panel -->
+      <div class="dashboard-panel">
+        <h3 style="border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px; margin-bottom: 20px;">Integration Settings</h3>
+        
+        <div class="input-group" style="margin-bottom: 20px;">
+          <input type="url" id="settings-webhook-url" placeholder=" " required>
+          <label for="settings-webhook-url">Make.com Webhook URL</label>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 20px;">
+          <input type="email" id="settings-owner-email" placeholder=" " required>
+          <label for="settings-owner-email">Owner Notification Email</label>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 20px;">
+          <input type="tel" id="settings-owner-whatsapp" placeholder=" " required>
+          <label for="settings-owner-whatsapp">Owner WhatsApp Number</label>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 20px;">
+          <input type="text" id="settings-telegram-token" placeholder=" " required>
+          <label for="settings-telegram-token">Telegram Bot Token</label>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 20px;">
+          <input type="text" id="settings-telegram-chatid" placeholder=" " required>
+          <label for="settings-telegram-chatid">Telegram Chat ID</label>
+        </div>
+        
+        <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 20px;">
+          Order updates and OTP emails are routed via this Make.com webhook URL, while checkout and status notifications are sent directly to the specified Telegram Chat ID.
+        </p>
+        
+        <button class="btn btn-primary" id="btn-save-settings" style="width: 100%;">
+          Save Configuration
+        </button>
+      </div>
+    </div>
+
+    <!-- Orders Management Panel -->
+    <div class="dashboard-panel" style="margin-bottom: 40px;">
+      <h3 style="border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px; margin-bottom: 20px;">Recent Orders</h3>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date &amp; Time</th>
+              <th>Customer</th>
+              <th>Items Detail</th>
+              <th style="text-align: center;">Premium Pkg</th>
+              <th>Amount</th>
+              <th>Status Action</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 40px 0;">Loading orders from database...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Customer History Panel -->
+    <div class="dashboard-panel" style="margin-bottom: 80px;">
+      <h3 style="border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px; margin-bottom: 20px;">Customer Database</h3>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Customer ID</th>
+              <th>Name</th>
+              <th>Mobile Number</th>
+              <th>Registered At</th>
+            </tr>
+          </thead>
+          <tbody id="customers-table-body">
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--color-text-muted); padding: 40px 0;">Loading customer records...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- State variables ---
+    let allOrders = [];
+    let allCustomers = [];
+    let revenueChartInstance = null;
+    let chartViewMode = 'daily'; // daily, weekly, monthly
+    let activeSettingsRow = null;
+
+    // --- DOM Elements ---
+    const ordersBody = document.getElementById('orders-table-body');
+    const customersBody = document.getElementById('customers-table-body');
+    const webhookInput = document.getElementById('settings-webhook-url');
+    const emailInput = document.getElementById('settings-owner-email');
+    const whatsappInput = document.getElementById('settings-owner-whatsapp');
+    const telegramTokenInput = document.getElementById('settings-telegram-token');
+    const telegramChatIdInput = document.getElementById('settings-telegram-chatid');
+    
+    // Revenue metrics
+    const revTotalEl = document.getElementById('val-total-revenue');
+    const revTodayEl = document.getElementById('val-revenue-today');
+    const ordersTodayEl = document.getElementById('val-orders-today');
+    const ordersPendingEl = document.getElementById('val-orders-pending');
+    const ordersCompletedEl = document.getElementById('val-orders-completed');
+    const customerCountEl = document.getElementById('val-customer-count');
+
+    // Action buttons
+    const btnRefresh = document.getElementById('btn-refresh');
+    const btnLogout = document.getElementById('btn-logout');
+    const btnSaveSettings = document.getElementById('btn-save-settings');
+
+    // Chart Tabs
+    const btnDaily = document.getElementById('btn-chart-daily');
+    const btnWeekly = document.getElementById('btn-chart-weekly');
+    const btnMonthly = document.getElementById('btn-chart-monthly');
+
+    // --- Event Listeners ---
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Load configuration settings from Supabase table 'notification_settings'
+      await loadNotificationSettings();
+
+      // 2. Load dashboard statistics
+      await loadDashboardData();
+      
+      // 3. Start client-side inactivity listener
+      resetInactivityTimer();
+    });
+
+    btnRefresh.addEventListener('click', (e) => {
+      e.preventDefault();
+      loadDashboardData();
+    });
+
+    btnLogout.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await logoutAdmin();
+    });
+
+    btnSaveSettings.addEventListener('click', async () => {
+      const webhookUrl = webhookInput.value.trim();
+      const ownerEmail = emailInput.value.trim();
+      const ownerWhatsApp = whatsappInput.value.trim();
+      const telegramToken = telegramTokenInput.value.trim();
+      const telegramChatId = telegramChatIdInput.value.trim();
+
+      if (webhookUrl && !webhookUrl.startsWith('http://') && !webhookUrl.startsWith('https://')) {
+        Toast.show('Please enter a valid HTTP/HTTPS Webhook URL.', true);
+        return;
+      }
+
+      if (!window.supabaseClient) {
+        Toast.show('Database client not initialized.', true);
+        return;
+      }
+
+      btnSaveSettings.disabled = true;
+      btnSaveSettings.textContent = 'Saving...';
+
+      try {
+        if (activeSettingsRow) {
+          // Update existing settings row
+          const { error } = await window.supabaseClient
+            .from('notification_settings')
+            .update({
+              make_webhook_url: webhookUrl,
+              owner_email: ownerEmail,
+              owner_whatsapp: ownerWhatsApp,
+              telegram_bot_token: telegramToken,
+              telegram_chat_id: telegramChatId
+            })
+            .eq('id', activeSettingsRow.id);
+
+          if (error) throw error;
+          Toast.show('Configuration updated successfully!');
+        } else {
+          // Insert new settings row
+          const { data, error } = await window.supabaseClient
+            .from('notification_settings')
+            .insert([{
+              make_webhook_url: webhookUrl,
+              owner_email: ownerEmail,
+              owner_whatsapp: ownerWhatsApp,
+              telegram_bot_token: telegramToken,
+              telegram_chat_id: telegramChatId
+            }])
+            .select();
+
+          if (error) throw error;
+          if (data && data.length > 0) {
+            activeSettingsRow = data[0];
+          }
+          Toast.show('Configuration created successfully!');
+        }
+      } catch (err) {
+        console.error('Failed to save settings:', err);
+        Toast.show('Error saving configuration: ' + err.message, true);
+      } finally {
+        btnSaveSettings.disabled = false;
+        btnSaveSettings.textContent = 'Save Configuration';
+      }
+    });
+
+    // Re-authentication modal helper functions
+    function showReauthModal() {
+      const modal = document.getElementById('auth-modal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('active'), 10);
+      document.body.classList.add('modal-open', 'overflow-hidden');
+      
+      document.getElementById('auth-modal-username').value = '';
+      document.getElementById('auth-modal-password').value = '';
+      document.getElementById('auth-modal-error').style.display = 'none';
+    }
+
+    function hideReauthModal() {
+      const modal = document.getElementById('auth-modal');
+      if (!modal) return;
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+      document.body.classList.remove('modal-open', 'overflow-hidden');
+      
+      const submitBtn = document.getElementById('auth-modal-submit-btn');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Authenticate';
+      }
+    }
+
+    // Inactivity check (shows re-auth modal instead of logging out completely)
+    let inactivityTimer;
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      const modal = document.getElementById('auth-modal');
+      if (modal && modal.classList.contains('active')) return;
+
+      inactivityTimer = setTimeout(() => {
+        showReauthModal();
+      }, 30 * 60 * 1000);
+    }
+
+    async function logoutAdmin() {
+      const token = localStorage.getItem('bh_admin_token');
+      if (token && window.supabaseClient) {
+        try {
+          await window.supabaseClient.from('admin_sessions').delete().eq('session_token', token);
+        } catch (err) {
+          console.error('Failed to delete session on DB:', err);
+        }
+      }
+      localStorage.removeItem('bh_admin_token');
+      localStorage.removeItem('bh_admin_id');
+      window.location.replace('login.html');
+    }
+
+    // Bind inactivity hooks
+    ['click', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+      document.addEventListener(evt, resetInactivityTimer);
+    });
+
+    // Periodic session check (every 1 minute)
+    let sessionCheckInterval = setInterval(async () => {
+      const token = localStorage.getItem('bh_admin_token');
+      const adminId = localStorage.getItem('bh_admin_id');
+      const modal = document.getElementById('auth-modal');
+      
+      if (modal && modal.classList.contains('active')) return;
+      
+      if (!token || !adminId) {
+        showReauthModal();
+        return;
+      }
+      
+      if (window.supabaseClient) {
+        try {
+          const { data: session, error } = await window.supabaseClient
+            .from('admin_sessions')
+            .select('*')
+            .eq('session_token', token)
+            .eq('admin_id', adminId)
+            .maybeSingle();
+            
+          if (error || !session) {
+            showReauthModal();
+            return;
+          }
+          
+          // Validate 30 minutes expiry
+          let lastActStr = session.last_activity;
+          if (lastActStr && !lastActStr.endsWith('Z') && !lastActStr.includes('+')) {
+            lastActStr += 'Z';
+          }
+          const lastAct = new Date(lastActStr);
+          const diffMins = (new Date() - lastAct) / (1000 * 60);
+          if (diffMins > 30) {
+            await window.supabaseClient.from('admin_sessions').delete().eq('id', session.id);
+            showReauthModal();
+            return;
+          }
+          
+          // Touch activity
+          await window.supabaseClient
+            .from('admin_sessions')
+            .update({ last_activity: new Date().toISOString() })
+            .eq('id', session.id);
+            
+        } catch (err) {
+          console.error('Session check failed:', err);
+        }
+      }
+    }, 60 * 1000);
+
+    // Bind re-authentication form submit event listener
+    document.addEventListener('DOMContentLoaded', () => {
+      const authForm = document.getElementById('auth-modal-form');
+      const authError = document.getElementById('auth-modal-error');
+      const authSubmitBtn = document.getElementById('auth-modal-submit-btn');
+
+      if (authForm) {
+        authForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const username = document.getElementById('auth-modal-username').value.trim();
+          const password = document.getElementById('auth-modal-password').value;
+          
+          if (!window.supabaseClient) {
+            authError.textContent = 'Database client not initialized.';
+            authError.style.display = 'block';
+            return;
+          }
+          
+          authSubmitBtn.disabled = true;
+          authSubmitBtn.textContent = 'Verifying...';
+          authError.style.display = 'none';
+          
+          try {
+            const { data: admin, error } = await window.supabaseClient
+              .from('admins')
+              .select('*')
+              .eq('username', username)
+              .eq('password', password)
+              .maybeSingle();
+              
+            if (error) throw error;
+            if (!admin) {
+              authError.textContent = 'Invalid administrator credentials.';
+              authError.style.display = 'block';
+              authSubmitBtn.disabled = false;
+              authSubmitBtn.textContent = 'Authenticate';
+              return;
+            }
+            
+            // Generate new session token
+            const token = (crypto.randomUUID && crypto.randomUUID()) || Math.random().toString(36).substring(2) + Date.now().toString(36);
+            const lastActivity = new Date().toISOString();
+            
+            // Insert session
+            const { error: sessionError } = await window.supabaseClient
+              .from('admin_sessions')
+              .insert([{
+                admin_id: admin.id,
+                session_token: token,
+                last_activity: lastActivity
+              }]);
+              
+            if (sessionError) throw sessionError;
+            
+            // Save to localStorage
+            localStorage.setItem('bh_admin_token', token);
+            localStorage.setItem('bh_admin_id', admin.id);
+            
+            // Hide modal
+            hideReauthModal();
+            
+            // Re-fetch statistics and re-render dashboard UI components
+            await loadDashboardData();
+            
+            // Reinitialize inactivity timer
+            resetInactivityTimer();
+            
+            Toast.show('Re-authentication successful. Session restored!');
+            
+          } catch (err) {
+            console.error('Re-auth validation error:', err);
+            authError.textContent = 'Authentication failed: ' + err.message;
+            authError.style.display = 'block';
+            authSubmitBtn.disabled = false;
+            authSubmitBtn.textContent = 'Authenticate';
+          }
+        });
+      }
+    });
+
+    async function loadNotificationSettings() {
+      if (!window.supabaseClient) return;
+
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('notification_settings')
+          .select('*');
+
+        if (!error && data && data.length > 0) {
+          activeSettingsRow = data[0];
+          webhookInput.value = activeSettingsRow.make_webhook_url || '';
+          emailInput.value = activeSettingsRow.owner_email || '';
+          whatsappInput.value = activeSettingsRow.owner_whatsapp || '';
+          telegramTokenInput.value = activeSettingsRow.telegram_bot_token || '';
+          telegramChatIdInput.value = activeSettingsRow.telegram_chat_id || '';
+        }
+      } catch (err) {
+        console.warn('Failed to query notification settings:', err);
+      }
+    }
+
+    // Chart tab switches
+    btnDaily.addEventListener('click', () => switchChartView('daily'));
+    btnWeekly.addEventListener('click', () => switchChartView('weekly'));
+    btnMonthly.addEventListener('click', () => switchChartView('monthly'));
+
+    // --- Dashboard Core Operations ---
+    async function loadDashboardData() {
+      ordersBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 40px 0;">Loading orders...</td></tr>`;
+      customersBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--color-text-muted); padding: 40px 0;">Loading customers...</td></tr>`;
+
+      const [ordersRes, customersRes] = await Promise.all([
+        DashboardManager.getAllOrders(),
+        DashboardManager.getAllCustomers()
+      ]);
+
+      if (ordersRes.error) {
+        Toast.show(`Failed to fetch orders: ${ordersRes.error}`, true);
+        return;
+      }
+      if (customersRes.error) {
+        Toast.show(`Failed to fetch customers: ${customersRes.error}`, true);
+        return;
+      }
+
+      allOrders = ordersRes.data || [];
+      allCustomers = customersRes.data || [];
+
+      // Update Dashboard Metric Cards
+      const metrics = DashboardManager.getRevenueMetrics(allOrders, allCustomers);
+      revTotalEl.textContent = `₹${metrics.totalRevenue}`;
+      revTodayEl.textContent = `₹${metrics.revenueToday}`;
+      ordersTodayEl.textContent = metrics.ordersToday;
+      ordersPendingEl.textContent = metrics.ordersPending;
+      ordersCompletedEl.textContent = metrics.ordersCompleted;
+      customerCountEl.textContent = metrics.customerCount;
+
+      const todayDateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' });
+      document.getElementById('text-revenue-today-date').textContent = `${todayDateStr} sales total`;
+
+      // Populate Tables & Graphs
+      populateOrdersTable();
+      populateCustomersTable();
+      renderRevenueChart();
+    }
+
+    function populateOrdersTable() {
+      ordersBody.innerHTML = '';
+
+      if (allOrders.length === 0) {
+        ordersBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 40px 0;">No orders found in database.</td></tr>`;
+        return;
+      }
+
+      allOrders.forEach(order => {
+        const tr = document.createElement('tr');
+        const shortOrderId = 'BH-' + order.id.split('-')[0].toUpperCase();
+        let createdStr = order.created_at;
+        if (createdStr && !createdStr.endsWith('Z') && !createdStr.includes('+')) {
+          createdStr += 'Z';
+        }
+        const dateStr = new Date(createdStr).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        const itemsStr = order.order_items.map(item => `${item.name} x${item.qty}`).join('<br>');
+        
+        tr.innerHTML = `
+          <td><strong style="font-family: var(--font-sans);">${shortOrderId}</strong></td>
+          <td style="font-size:0.8rem; color: var(--color-text-muted);">${dateStr}</td>
+          <td>
+            <strong>${order.customer_name}</strong><br>
+            <span style="font-size:0.8rem; color: var(--color-text-muted);">${order.customer_mobile}</span>
+          </td>
+          <td style="font-size:0.85rem; line-height: 1.4;">${itemsStr}</td>
+          <td style="text-align: center;">${order.packaging ? '<span style="color:var(--color-gold-hover); font-weight:bold;">Yes</span>' : '<span style="color:var(--color-text-muted);">No</span>'}</td>
+          <td><strong>₹${order.total_amount}</strong></td>
+          <td>
+            <select class="status-selector" onchange="updateStatus('${order.id}', this.value)">
+              <option value="Pending" ${order.order_status === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option value="Preparing" ${order.order_status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+              <option value="Ready" ${order.order_status === 'Ready' ? 'selected' : ''}>Ready</option>
+              <option value="Out For Delivery" ${order.order_status === 'Out For Delivery' ? 'selected' : ''}>Out For Delivery</option>
+              <option value="Delivered" ${order.order_status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+              <option value="Cancelled" ${order.order_status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+          </td>
+        `;
+        ordersBody.appendChild(tr);
+      });
+    }
+
+    function populateCustomersTable() {
+      customersBody.innerHTML = '';
+
+      if (allCustomers.length === 0) {
+        customersBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--color-text-muted); padding: 40px 0;">No customers registered in database.</td></tr>`;
+        return;
+      }
+
+      allCustomers.forEach(cust => {
+        const tr = document.createElement('tr');
+        const shortCustId = cust.id.split('-')[0].toUpperCase();
+        const dateStr = new Date(cust.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+        tr.innerHTML = `
+          <td><code>${shortCustId}</code></td>
+          <td><strong>${cust.name}</strong></td>
+          <td>${cust.mobile}</td>
+          <td style="font-size: 0.85rem; color: var(--color-text-muted);">${dateStr}</td>
+        `;
+        customersBody.appendChild(tr);
+      });
+    }
+
+    // Update Order Status Handler
+    window.updateStatus = async function(orderId, newStatus) {
+      const { data, error } = await DashboardManager.updateOrderStatus(orderId, newStatus);
+      if (error) {
+        Toast.show(`Failed to update status: ${error}`, true);
+        loadDashboardData(); // reload to sync back
+      } else {
+        Toast.show(`Order status updated to "${newStatus}"`);
+        // Find locally and update stats without full re-fetch
+        const orderIdx = allOrders.findIndex(o => o.id === orderId);
+        if (orderIdx !== -1) {
+          allOrders[orderIdx].order_status = newStatus;
+          
+          // Re-aggregate and update metrics and charts
+          const metrics = DashboardManager.getRevenueMetrics(allOrders, allCustomers);
+          revTotalEl.textContent = `₹${metrics.totalRevenue}`;
+          ordersTodayEl.textContent = metrics.ordersToday;
+          ordersPendingEl.textContent = metrics.ordersPending;
+          ordersCompletedEl.textContent = metrics.ordersCompleted;
+          customerCountEl.textContent = metrics.customerCount;
+          
+          renderRevenueChart();
+        }
+      }
+    };
+
+    // --- Charting Section ---
+    function switchChartView(mode) {
+      chartViewMode = mode;
+      
+      btnDaily.classList.remove('active-tab-btn');
+      btnWeekly.classList.remove('active-tab-btn');
+      btnMonthly.classList.remove('active-tab-btn');
+      
+      if (mode === 'daily') btnDaily.classList.add('active-tab-btn');
+      if (mode === 'weekly') btnWeekly.classList.add('active-tab-btn');
+      if (mode === 'monthly') btnMonthly.classList.add('active-tab-btn');
+      
+      renderRevenueChart();
+    }
+
+    function renderRevenueChart() {
+      const chartsData = DashboardManager.getRevenueChartsData(allOrders);
+      let activeSet = null;
+      
+      if (chartViewMode === 'daily') activeSet = chartsData.daily;
+      if (chartViewMode === 'weekly') activeSet = chartsData.weekly;
+      if (chartViewMode === 'monthly') activeSet = chartsData.monthly;
+      
+      if (!activeSet) return;
+
+      const ctx = document.getElementById('revenueChart').getContext('2d');
+      
+      if (revenueChartInstance) {
+        revenueChartInstance.destroy();
+      }
+
+      revenueChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: activeSet.labels,
+          datasets: [{
+            label: 'Revenue (₹)',
+            data: activeSet.data,
+            backgroundColor: '#800000', // Maroon
+            borderColor: '#D4AF37', // Gold
+            borderWidth: 1,
+            hoverBackgroundColor: '#570000'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: '#EEEEEE'
+              },
+              ticks: {
+                callback: function(value) {
+                  return '₹' + value;
+                },
+                color: '#1A1A1A',
+                font: {
+                  family: 'Hanken Grotesk'
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#1A1A1A',
+                font: {
+                  family: 'Hanken Grotesk'
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#1A1A1A',
+              titleFont: {
+                family: 'Libre Caslon Text'
+              },
+              bodyFont: {
+                family: 'Hanken Grotesk'
+              },
+              callbacks: {
+                label: function(context) {
+                  return ' Revenue: ₹' + context.raw;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+  
+  <style>
+    /* Tab button active styling in settings */
+    .btn-secondary.active-tab-btn {
+      background-color: var(--color-primary-maroon);
+      color: var(--color-surface-white);
+      border-color: var(--color-primary-maroon);
+    }
+  </style>
+  <!-- Re-Authentication Overlay Modal -->
+  <div id="auth-modal" class="auth-modal-overlay">
+    <div class="auth-modal-content">
+      <h2 style="font-family: var(--font-serif); color: var(--color-primary-maroon); margin-top: 0; font-size: 1.8rem; text-align: center;">Session Expired</h2>
+      <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 25px; text-align: center;">Please re-authenticate with your administrator credentials to resume your session.</p>
+      <div class="gold-divider" style="margin: 15px auto; max-width: 200px;"></div>
+      
+      <form id="auth-modal-form">
+        <div class="input-group" style="margin-bottom: 20px; text-align: left;">
+          <input type="text" id="auth-modal-username" placeholder=" " required style="width:100%;">
+          <label for="auth-modal-username">Admin Username</label>
+        </div>
+        <div class="input-group" style="margin-bottom: 24px; text-align: left;">
+          <input type="password" id="auth-modal-password" placeholder=" " required style="width:100%;">
+          <label for="auth-modal-password">Password</label>
+        </div>
+        <div id="auth-modal-error" style="color: var(--color-error); font-size: 0.85rem; margin-bottom: 15px; display: none; text-align: center; font-weight: 600;"></div>
+        
+        <button type="submit" class="btn btn-primary" id="auth-modal-submit-btn" style="width: 100%; height: 50px; font-weight: 700;">
+          Authenticate
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

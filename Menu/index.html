@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu | Bengali Hotel Restaurant</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    :root {
+      --color-primary-maroon: #800000;
+      --color-primary-dark: #570000;
+      --color-gold: #D4AF37;
+      --color-surface-white: #ffffff;
+      --color-surface-cream: #F8F5F2;
+      --color-text-dark: #1A1A1A;
+      --color-text-muted: #5a413d;
+      --color-border-light: #EEEEEE;
+    }
+
+    body {
+      background-color: var(--color-surface-cream) !important;
+    }
+
+    /* --- Page Column Grid --- */
+    .menu-page-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 20px;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    @media (min-width: 992px) {
+      .menu-page-wrapper {
+        display: grid;
+        grid-template-columns: 20% 55% 25%;
+        gap: 20px;
+        align-items: start;
+      }
+    }
+
+    /* Column Styles */
+    .menu-categories-col {
+      width: 100%;
+    }
+
+    .menu-items-col {
+      width: 100%;
+    }
+
+    .menu-cart-col {
+      width: 100%;
+    }
+
+    @media (min-width: 992px) {
+      .menu-categories-col {
+        position: sticky;
+        top: 100px;
+      }
+
+      .menu-cart-col {
+        position: sticky;
+        top: 100px;
+        max-width: 320px;
+      }
+    }
+
+    /* Category sidebar styling */
+    .categories-nav {
+      background-color: var(--color-surface-white);
+      border: 1px solid var(--color-border-light);
+      padding: 15px;
+    }
+
+    .categories-nav h4 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+      margin-bottom: 15px;
+      font-family: var(--font-sans);
+    }
+
+    .categories-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .category-btn {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 10px 14px;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+      margin-bottom: 5px;
+      border-radius: 0 !important;
+    }
+
+    .category-btn:hover {
+      color: var(--color-primary-maroon);
+      border-left-color: var(--color-gold);
+      background-color: var(--color-surface-cream);
+    }
+
+    .category-btn.active {
+      color: white !important;
+      border-left-color: var(--color-gold) !important;
+      background-color: var(--color-primary-maroon) !important;
+      font-weight: 700;
+    }
+
+    /* Dish Cards with compact styling (40% less vertical spacing) */
+    .menu-section {
+      background-color: var(--color-surface-white);
+      border: 1px solid var(--color-border-light);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .menu-section-title {
+      font-size: 1.4rem;
+      border-bottom: 1px solid var(--color-border-light);
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+      font-family: var(--font-serif);
+      color: var(--color-primary-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .menu-section-title h2 {
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    .menu-section-title span {
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      color: var(--color-text-muted);
+      font-weight: normal;
+    }
+
+    .menu-item-card {
+      background-color: var(--color-surface-white);
+      border: 1px solid var(--color-border-light);
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 0 !important;
+      transition: border-color 0.2s ease;
+    }
+
+    .menu-item-card:hover {
+      border-color: var(--color-gold);
+    }
+
+    .menu-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .menu-item-name {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-primary-maroon);
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .menu-item-price {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--color-text-dark);
+      white-space: nowrap;
+      margin-left: 10px;
+    }
+
+    .menu-item-desc {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+
+    .menu-item-footer {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 4px;
+    }
+
+    /* Compact Cart design */
+    .cart-sidebar {
+      background-color: var(--color-surface-white);
+      border: 1px solid var(--color-border-light);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-title {
+      font-size: 1.2rem;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--color-primary-maroon);
+      color: var(--color-primary-maroon);
+    }
+
+    .cart-count-badge {
+      background-color: var(--color-gold);
+      color: var(--color-primary-dark);
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      font-weight: bold;
+    }
+
+    .cart-items-list {
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      padding-right: 4px;
+    }
+
+    /* Scrollbar styling for cart list */
+    .cart-items-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .cart-items-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    .cart-items-list::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+    }
+    .cart-items-list::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border-light);
+      font-size: 0.85rem;
+    }
+
+    .cart-item-info {
+      flex: 1;
+      padding-right: 8px;
+    }
+
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--color-text-dark);
+      line-height: 1.2;
+    }
+
+    .cart-item-price-calc {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    .cart-item-total {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--color-text-dark);
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    /* Small quantity buttons in cart */
+    .cart-sidebar .qty-btn {
+      width: 24px;
+      height: 24px;
+      font-size: 0.8rem;
+    }
+    .cart-sidebar .qty-val {
+      width: 24px;
+      height: 24px;
+      line-height: 22px;
+      font-size: 0.8rem;
+    }
+
+    .qty-btn {
+      background-color: var(--color-surface-cream);
+      border: 1px solid var(--color-border-light);
+      color: var(--color-text-dark);
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      font-size: 1rem;
+      padding: 0;
+      border-radius: 0 !important;
+    }
+
+    .qty-btn:hover {
+      background-color: var(--color-primary-maroon);
+      color: var(--color-surface-white);
+      border-color: var(--color-primary-maroon);
+    }
+
+    .qty-val {
+      width: 30px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-top: 1px solid var(--color-border-light);
+      border-bottom: 1px solid var(--color-border-light);
+      line-height: 28px;
+      height: 30px;
+    }
+
+    .btn-add-cart {
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      background-color: var(--color-primary-maroon);
+      color: var(--color-surface-white);
+      border-radius: 0 !important;
+    }
+
+    .packaging-box {
+      background-color: var(--color-surface-cream);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
+    .packaging-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .packaging-label input {
+      margin-top: 3px;
+    }
+
+    .packaging-title {
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      font-size: 0.85rem;
+    }
+
+    .packaging-desc {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    .cart-summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 0.85rem;
+    }
+
+    .cart-summary-row.total {
+      border-top: 2px solid var(--color-border-light);
+      padding-top: 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-top: 8px;
+    }
+
+    /* Mobile Sticky Bar & Drawer Overlay */
+    .mobile-cart-bar {
+      display: none;
+    }
+
+    .cart-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    /* --- Mobile Responsive Layout --- */
+    @media (max-width: 991px) {
+      .menu-page-wrapper {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .menu-categories-col {
+        width: 100%;
+        position: sticky;
+        top: 0; /* sticky at top of viewport on mobile */
+        z-index: 90;
+        margin-bottom: 0;
+        background-color: var(--color-surface-white);
+        border: 1px solid var(--color-border-light);
+        padding: 6px 12px;
+        overflow-x: auto;
+        white-space: nowrap;
+        display: block;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      }
+
+      .categories-nav {
+        border: none;
+        padding: 0;
+      }
+
+      .categories-nav h4 {
+        display: none;
+      }
+
+      .categories-list {
+        display: flex;
+        gap: 10px;
+        flex-direction: row;
+        width: max-content;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .category-btn {
+        width: auto;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        margin-bottom: 0;
+      }
+
+      .category-btn.active {
+        border-bottom-color: var(--color-gold) !important;
+        border-left: none !important;
+        background-color: var(--color-primary-maroon) !important;
+        color: white !important;
+      }
+
+      .menu-items-col {
+        width: 100%;
+      }
+
+      .menu-cart-col {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .cart-sidebar {
+        border: 1px solid var(--color-border-light);
+        padding: 20px;
+      }
+
+      .cart-title {
+        border-bottom: 2px solid var(--color-primary-maroon);
+        padding-bottom: 8px;
+      }
+    }
+  </style>
+  <meta name="description" content="Browse our authentic Bengali menu including basanti pulao, mutton kosha, fish thalis, and fresh luchis. Quick ordering at Bengali Hotel Saket.">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header>
+    <div class="container header-container">
+      <div onclick="window.location.href='../index.html'" style="cursor:pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.2s ease, opacity 0.2s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.opacity='0.95';" onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';">
+        <img src="../login/logo.png?v=1.3" alt="Bengali Hotel Logo" style="height: 45px; width: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-gold); box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);">
+        <h1 style="font-size: 1.8rem; margin: 0; color: var(--color-surface-white);">Bengali <span style="color: var(--color-gold);">Hotel</span></h1>
+      </div>
+      <nav class="nav-links">
+        <div class="user-badge" id="user-badge-info">
+          <span><span class="welcome-prefix">Namaskar, </span><strong><span id="cust-name-display">Guest</span></strong></span>
+        </div>
+        <a href="#" class="nav-link" id="btn-logout">Logout</a>
+        <a href="../dashboard/index.html" class="nav-link btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; border-color: var(--color-gold); color: var(--color-gold);">Owner Panel</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Grid: Menu Categories + Dishes + Cart -->
+  <div class="container" style="margin-top: 20px;">
+    <div class="menu-page-wrapper">
+      <!-- Left Column: Categories Sidebar -->
+      <div class="menu-categories-col">
+        <div class="categories-nav">
+          <h4>Categories</h4>
+          <ul class="categories-list" id="category-tabs">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Middle Column: Menu Items Section -->
+      <div class="menu-items-col" id="dishes-container">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Right Column: My Order Cart Section -->
+      <div class="menu-cart-col">
+        <div class="cart-sidebar">
+          <h3 class="cart-title">
+            <span>My Order <span class="cart-count-badge" id="cart-qty-badge">0</span></span>
+            <span id="close-cart-drawer" style="cursor: pointer; display: none; font-size: 1.5rem; line-height: 1;">&times;</span>
+          </h3>
+          
+          <!-- Cart Items -->
+          <div class="cart-items-list" id="cart-items">
+            <div class="cart-empty-msg">Your dining cart is empty. Add delicious dishes from our menu!</div>
+          </div>
+
+          <!-- Premium Packaging Checkbox -->
+          <div class="packaging-box">
+            <label class="packaging-label">
+              <input type="checkbox" id="premium-packaging-checkbox">
+              <div>
+                <span class="packaging-title">Premium Packaging (₹100)</span>
+                <p class="packaging-desc">Eco-friendly clay pots and spill-proof metallic tin seals to preserve authentic taste.</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- Totals & Checkout -->
+          <div class="cart-summary">
+            <div class="cart-summary-row">
+              <span>Subtotal</span>
+              <span id="cart-subtotal">₹0</span>
+            </div>
+            <div class="cart-summary-row" id="packaging-fee-row" style="display: none;">
+              <span>Premium Packaging</span>
+              <span>₹100</span>
+            </div>
+            <div class="cart-summary-row total">
+              <span>Total Amount</span>
+              <span id="cart-total">₹0</span>
+            </div>
+            
+            <button class="btn btn-primary" id="btn-checkout" style="width: 100%; margin-top: 15px;" disabled>
+              Review &amp; Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="../Menu/index.html">Our Menu</a></li>
+            <li><a href="#">Service</a></li>
+            <li><a href="#">Reservation</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Contact</h3>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span class="footer-contact-text">Saidulajab, Saket, New Delhi - 110030</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+            <span class="footer-contact-text">+91 9911796021</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+            <span class="footer-contact-text">bengalihotel.com</span>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h3>Opening Hours</h3>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Monday - Sunday</div>
+            <div class="footer-hours-val">12:30 PM - 2:00 AM</div>
+          </div>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Free Home Delivery</div>
+            <div class="footer-hours-val">Order Above Rs. 199</div>
+            <div class="footer-hours-val" style="font-size: 0.8rem; color: var(--color-gold); margin-top: 2px;">(Free delivery upto 1 km only)</div>
+          </div>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Delivery Timings</div>
+            <div class="footer-hours-val">1:00 PM - 11:00 PM</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">
+          &copy; 2026 Bengali Hotel. All rights reserved. Developed by <a href="https://portfolio-shyamal-3s.vercel.app/" target="_blank">Shyamal Jana</a>
+        </div>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com/bengali.dhaba.3?mibextid=wwXIfr&rdid=2FfXTDLW8JQO5E12&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1ANrrqQkR9%2F%3Fmibextid%3DwwXIfr#" target="_blank" class="footer-social-btn" aria-label="Facebook">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/bengalihotelsaket" target="_blank" class="footer-social-btn" aria-label="Instagram">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase-js.js"></script>
+  <script src="../js/supabase.js?v=1.2"></script>
+  <script>
+    // --- Data Definition ---
+    const MENU_ITEMS = [
+      // 1. Rice Items
+      { id: 'rice-1', name: 'Plain Rice', category: 'Rice Items', price: 50, desc: 'Steamed premium basmati rice, fluffy and warm.' },
+      { id: 'rice-2', name: 'Jeera Rice', category: 'Rice Items', price: 60, desc: 'Basmati rice tempered with cumin seeds and aromatic ghee.' },
+      { id: 'rice-3', name: 'Paneer Fried Rice', category: 'Rice Items', price: 120, desc: 'Fragrant stir-fried rice loaded with paneer cubes and mild spices.' },
+      { id: 'rice-4', name: 'Egg Fried Rice', category: 'Rice Items', price: 120, desc: 'Classic stir-fried rice with scrambled eggs and aromatic seasonings.' },
+      { id: 'rice-5', name: 'Chicken Fried Rice', category: 'Rice Items', price: 150, desc: 'Wok-tossed rice with tender chicken chunks and vegetables.' },
+      { id: 'rice-6', name: 'Egg Chicken Fried Rice', category: 'Rice Items', price: 180, desc: 'Delicious combination of chicken pieces and scrambled eggs tossed with rice.' },
+      { id: 'rice-7', name: 'Onion Tomato Fried Rice', category: 'Rice Items', price: 100, desc: 'Zesty rice cooked with caramelized onions, tomatoes, and home spices.' },
+      
+      // 2. Veg Thali
+      { id: 'thali-v1', name: 'Veg Thali', category: 'Veg Thali', price: 80, desc: 'Rice + 4 Roti + Aloo Bhaja + Seasonal Sabji + Dal' },
+      { id: 'thali-v2', name: 'Paneer Thali', category: 'Veg Thali', price: 200, desc: 'Rice + Roti + Aloo Bhaja + Paneer Curry' },
+      { id: 'thali-v3', name: 'Mix Thali', category: 'Veg Thali', price: 130, desc: 'Choose One Sabji:<br>Rajma / Chhole / Dal Makhani<br>Includes Rice + 4 Roti + Bhaja + Selected Sabji' },
+      
+      // 3. Non Veg Thali
+      { id: 'thali-nv1', name: 'Fish Thali (Mustard)', category: 'Non Veg Thali', price: 200, desc: '2 pcs Mustard Fish Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv2', name: 'Fish Thali (Spicy)', category: 'Non Veg Thali', price: 200, desc: '2 pcs Spicy Fish Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv3', name: 'Egg Thali', category: 'Non Veg Thali', price: 150, desc: '2 pcs Egg Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv4', name: 'Chicken Thali', category: 'Non Veg Thali', price: 200, desc: '2 pcs Chicken Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv5', name: 'Mutton Thali', category: 'Non Veg Thali', price: 300, desc: '2 pcs Mutton Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv6', name: 'Prawns Thali', category: 'Non Veg Thali', price: 200, desc: '3–4 pcs Prawn Curry + Rice + 4 Roti + Dal + Bhaja' },
+      
+      // 4. Paratha Combo
+      { id: 'combo-1', name: 'Plain Paratha Combo', category: 'Paratha Combo', price: 120, desc: '2 Plain Parathas + Seasonal Sabji + Salad' },
+      { id: 'combo-2', name: 'Aloo Pyaz Paratha Combo', category: 'Paratha Combo', price: 150, desc: 'Stuffed Aloo & Onion Paratha + Seasonal Sabji + Salad' },
+      { id: 'combo-3', name: 'Paneer Paratha Combo', category: 'Paratha Combo', price: 180, desc: 'Stuffed Paneer Paratha + Seasonal Sabji + Salad' },
+      { id: 'combo-4', name: 'Egg Paratha Combo', category: 'Paratha Combo', price: 180, desc: 'Egg Stuffed Paratha + Seasonal Sabji + Salad' },
+      
+      // 5. Veg Main Course
+      { id: 'veg-1', name: 'Seasonal Sabji', category: 'Veg Main Course', price: 50, desc: 'Fresh seasonal vegetable curry prepared daily with authentic Bengali spices.' },
+      { id: 'veg-2', name: 'Aloo Bhujia', category: 'Veg Main Course', price: 60, desc: 'Crispy spiced potato strips fried to perfection.' },
+      { id: 'veg-3', name: 'Aloo Chokha', category: 'Veg Main Course', price: 100, desc: 'Traditional Bengali-style mashed potatoes with onions, mustard oil, and spices.' },
+      { id: 'veg-4', name: 'Jhuri Aloo Bhaja', category: 'Veg Main Course', price: 100, desc: 'Thin crispy potato fries seasoned in Bengali style.' },
+      { id: 'veg-5', name: 'Lemon Aloo', category: 'Veg Main Course', price: 100, desc: 'Tangy lemon-flavored potato preparation with aromatic spices.' },
+      { id: 'veg-6', name: 'Rajma', category: 'Veg Main Course', price: 80, desc: 'Slow-cooked kidney beans in rich masala gravy.' },
+      { id: 'veg-7', name: 'Chola', category: 'Veg Main Course', price: 80, desc: 'Traditional Bengali-style chickpea curry.' },
+      { id: 'veg-8', name: 'Dal Makhani', category: 'Veg Main Course', price: 80, desc: 'Creamy black lentils cooked with butter and aromatic spices.' },
+      { id: 'veg-9', name: 'Dal Fry', category: 'Veg Main Course', price: 100, desc: 'Yellow lentils tempered with garlic, onions, and spices.' },
+      { id: 'veg-10', name: 'Bhindi Fry', category: 'Veg Main Course', price: 100, desc: 'Crispy fried okra cooked with Bengali spices.' },
+      { id: 'veg-11', name: 'Baingan Fry', category: 'Veg Main Course', price: 100, desc: 'Golden-fried eggplant slices with traditional seasoning.' },
+      { id: 'veg-12', name: 'Karela Fry', category: 'Veg Main Course', price: 100, desc: 'Crispy bitter gourd fry with Bengali spices.' },
+      { id: 'veg-13', name: 'Paneer Bhurji', category: 'Veg Main Course', price: 100, desc: 'Scrambled cottage cheese cooked with onions, tomatoes, and spices.' },
+      { id: 'veg-14', name: 'Shahi Paneer', category: 'Veg Main Course', price: 150, desc: 'Paneer cubes cooked in a rich royal-style creamy gravy.' },
+      { id: 'veg-15', name: 'Butter Masala Paneer', category: 'Veg Main Course', price: 150, desc: 'Paneer cooked in creamy butter tomato masala gravy.' },
+      
+      // 6. Non Veg Main Course
+      { id: 'nveg-1', name: 'Fish Curry (Spicy)', category: 'Non Veg Main Course', price: 150, desc: 'Traditional Bengali spicy fish curry prepared with aromatic spices.' },
+      { id: 'nveg-2', name: 'Fish Curry (Mustard)', category: 'Non Veg Main Course', price: 150, desc: 'Authentic Bengali fish curry cooked in rich mustard gravy.' },
+      { id: 'nveg-3', name: 'Prawns Curry', category: 'Non Veg Main Course', price: 160, desc: 'Fresh prawns cooked in flavorful Bengali-style curry.' },
+      { id: 'nveg-4', name: 'Chicken Curry', category: 'Non Veg Main Course', price: 150, desc: 'Classic Bengali chicken curry with traditional spices.' },
+      { id: 'nveg-5', name: 'Chicken Kossa', category: 'Non Veg Main Course', price: 170, desc: 'Slow-cooked rich Bengali-style chicken kossa.' },
+      { id: 'nveg-6', name: 'Mutton Curry', category: 'Non Veg Main Course', price: 240, desc: 'Tender mutton pieces cooked in flavorful curry gravy.' },
+      { id: 'nveg-7', name: 'Mutton Kossa', category: 'Non Veg Main Course', price: 260, desc: 'Authentic Bengali mutton kossa with rich spices and thick gravy.' },
+      { id: 'nveg-8', name: 'Egg Curry', category: 'Non Veg Main Course', price: 80, desc: 'Boiled eggs cooked in traditional Bengali curry.' },
+      { id: 'nveg-9', name: 'Egg Kossa', category: 'Non Veg Main Course', price: 100, desc: 'Eggs cooked in rich Bengali-style kossa gravy.' },
+      { id: 'nveg-10', name: 'Fish Fry', category: 'Non Veg Main Course', price: 150, desc: 'Crispy golden fish fry served Bengali style.' },
+      { id: 'nveg-11', name: 'Omelette / Poach', category: 'Non Veg Main Course', price: 50, desc: 'Fresh egg omelette or poached egg prepared to order.' },
+      { id: 'nveg-12', name: 'Egg Bhurji', category: 'Non Veg Main Course', price: 60, desc: 'Spiced scrambled eggs cooked with onions and herbs.' },
+      
+      // 7. Bread
+      { id: 'bread-1', name: 'Tawa Roti', category: 'Bread', price: 10, desc: 'Freshly prepared soft whole wheat tawa roti.' },
+      { id: 'bread-2', name: 'Butter Tawa Roti', category: 'Bread', price: 15, desc: 'Soft tawa roti topped with melted butter.' },
+      { id: 'bread-3', name: 'Thepla', category: 'Bread', price: 30, desc: 'Traditional spiced Indian flatbread cooked fresh on tawa.' }
+    ];
+
+    const CATEGORIES = [
+      'Rice Items',
+      'Veg Thali',
+      'Non Veg Thali',
+      'Paratha Combo',
+      'Veg Main Course',
+      'Non Veg Main Course',
+      'Bread'
+    ];
+
+    // --- State Variables ---
+    let cart = [];
+    let selectedCategory = CATEGORIES[0];
+
+    // --- DOM Elements ---
+    const custNameDisplay = document.getElementById('cust-name-display');
+    const btnLogout = document.getElementById('btn-logout');
+    const categoryTabs = document.getElementById('category-tabs');
+    const dishesContainer = document.getElementById('dishes-container');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartQtyBadge = document.getElementById('cart-qty-badge');
+    const cartSubtotalEl = document.getElementById('cart-subtotal');
+    const cartTotalEl = document.getElementById('cart-total');
+    const packagingFeeRow = document.getElementById('packaging-fee-row');
+    const premiumPackagingCheckbox = document.getElementById('premium-packaging-checkbox');
+    const btnCheckout = document.getElementById('btn-checkout');
+
+    // --- Initialization & Verification ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Force customer login session
+      if (!SessionManager.isLoggedIn()) {
+        console.warn("Session check failed, redirecting to login page...");
+        window.location.href = '../login/log.html';
+        return;
+      }
+      
+      const customer = SessionManager.getCurrentCustomer();
+      console.log("Customer session successfully loaded in Menu page:", customer);
+      
+      // Update UI elements
+      custNameDisplay.textContent = customer.name;
+      
+      // 2. Load cart from local storage if existing
+      loadCartFromStorage();
+      
+      // 3. Render page
+      renderCategories();
+      renderDishes();
+      updateCartUI();
+
+      // Mobile cart drawer setup removed as cart is now displayed inline on mobile
+    });
+
+    // Logout Action
+    btnLogout.addEventListener('click', (e) => {
+      e.preventDefault();
+      SessionManager.logoutCustomer();
+      window.location.href = '../login/log.html';
+    });
+
+    // --- Cart Persistence ---
+    function saveCartToStorage() {
+      localStorage.setItem('bh_shopping_cart', JSON.stringify(cart));
+    }
+    
+    function loadCartFromStorage() {
+      const savedCart = localStorage.getItem('bh_shopping_cart');
+      if (savedCart) {
+        cart = JSON.parse(savedCart);
+      }
+    }
+
+    // --- Rendering Functions ---
+    function renderCategories() {
+      categoryTabs.innerHTML = '';
+      CATEGORIES.forEach(cat => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.className = `category-btn ${cat === selectedCategory ? 'active' : ''}`;
+        btn.textContent = cat;
+        btn.addEventListener('click', () => {
+          selectedCategory = cat;
+          document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderDishes();
+        });
+        li.appendChild(btn);
+        categoryTabs.appendChild(li);
+      });
+    }
+
+    function renderDishes() {
+      dishesContainer.innerHTML = '';
+      
+      // Create section container
+      const section = document.createElement('div');
+      section.className = 'menu-section';
+      
+      const sectionHeader = document.createElement('div');
+      sectionHeader.className = 'menu-section-title';
+      sectionHeader.innerHTML = `
+        <h2>${selectedCategory}</h2>
+        <span>Bengali Specialties</span>
+      `;
+      section.appendChild(sectionHeader);
+      
+      // Filter items
+      const items = MENU_ITEMS.filter(item => item.category === selectedCategory);
+      
+      items.forEach(dish => {
+        const dishEl = document.createElement('div');
+        dishEl.className = 'menu-item-card';
+        
+        // Check if item is already in cart to display quantities
+        const cartItem = cart.find(ci => ci.id === dish.id);
+        const qty = cartItem ? cartItem.qty : 0;
+        
+        let actionHTML = '';
+        if (qty > 0) {
+          actionHTML = `
+            <div class="menu-item-actions">
+              <button class="qty-btn" onclick="updateQty('${dish.id}', -1)">&minus;</button>
+              <div class="qty-val">${qty}</div>
+              <button class="qty-btn" onclick="updateQty('${dish.id}', 1)">&plus;</button>
+            </div>
+          `;
+        } else {
+          actionHTML = `
+            <button class="btn btn-add-cart" onclick="addToCart('${dish.id}')">Add To Cart</button>
+          `;
+        }
+        
+        dishEl.innerHTML = `
+          <div class="menu-item-header">
+            <span class="menu-item-name">${dish.name}</span>
+            <span class="menu-item-price">₹${dish.price}</span>
+          </div>
+          <p class="menu-item-desc">${dish.desc}</p>
+          <div class="menu-item-footer">
+            ${actionHTML}
+          </div>
+        `;
+        section.appendChild(dishEl);
+      });
+      
+      dishesContainer.appendChild(section);
+    }
+
+    // --- Cart Modification Logic ---
+    window.addToCart = function(dishId) {
+      const dish = MENU_ITEMS.find(item => item.id === dishId);
+      if (dish) {
+        cart.push({
+          id: dish.id,
+          name: dish.name,
+          price: dish.price,
+          qty: 1
+        });
+        saveCartToStorage();
+        renderDishes();
+        updateCartUI();
+        Toast.show(`${dish.name} added to cart.`);
+      }
+    };
+
+    window.updateQty = function(dishId, change) {
+      const index = cart.findIndex(item => item.id === dishId);
+      if (index !== -1) {
+        cart[index].qty += change;
+        
+        if (cart[index].qty <= 0) {
+          const name = cart[index].name;
+          cart.splice(index, 1);
+          Toast.show(`${name} removed from cart.`);
+        }
+        
+        saveCartToStorage();
+        renderDishes();
+        updateCartUI();
+      }
+    };
+
+    premiumPackagingCheckbox.addEventListener('change', () => {
+      // Save packaging option in localStorage
+      localStorage.setItem('bh_premium_packaging', premiumPackagingCheckbox.checked);
+      updateCartUI();
+    });
+
+    function updateCartUI() {
+      // 1. Clear cart lists
+      cartItemsContainer.innerHTML = '';
+      
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = `<div class="cart-empty-msg">Your dining cart is empty. Add delicious dishes from our menu!</div>`;
+        cartQtyBadge.textContent = '0';
+        cartSubtotalEl.textContent = '₹0';
+        cartTotalEl.textContent = '₹0';
+        packagingFeeRow.style.display = 'none';
+        btnCheckout.disabled = true;
+        
+        // no mobile bar
+        return;
+      }
+      
+      // 2. Populate cart elements
+      let totalQty = 0;
+      let subtotal = 0;
+      
+      cart.forEach(item => {
+        totalQty += item.qty;
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+        
+        const itemEl = document.createElement('div');
+        itemEl.className = 'cart-item';
+        itemEl.innerHTML = `
+          <div class="cart-item-info">
+            <span class="cart-item-name">${item.name}</span>
+            <div class="cart-item-price-calc">${item.qty} x ₹${item.price}</div>
+          </div>
+          <div class="menu-item-actions" style="margin-right: 10px;">
+            <button class="qty-btn" style="width:24px; height:24px; font-size:0.8rem;" onclick="updateQty('${item.id}', -1)">&minus;</button>
+            <div class="qty-val" style="width:24px; height:24px; line-height:22px; font-size:0.8rem;">${item.qty}</div>
+            <button class="qty-btn" style="width:24px; height:24px; font-size:0.8rem;" onclick="updateQty('${item.id}', 1)">&plus;</button>
+          </div>
+          <div class="cart-item-total">₹${itemTotal}</div>
+        `;
+        cartItemsContainer.appendChild(itemEl);
+      });
+      
+      // Update badge
+      cartQtyBadge.textContent = totalQty;
+      
+      // Calculate packaging
+      const isPackagingSelected = premiumPackagingCheckbox.checked;
+      const packagingFee = isPackagingSelected ? 100 : 0;
+      
+      if (isPackagingSelected) {
+        packagingFeeRow.style.display = 'flex';
+      } else {
+        packagingFeeRow.style.display = 'none';
+      }
+      
+      const grandTotal = subtotal + packagingFee;
+      
+      cartSubtotalEl.textContent = `₹${subtotal}`;
+      cartTotalEl.textContent = `₹${grandTotal}`;
+      
+      // Enable checkout button unconditionally when cart is not empty
+      btnCheckout.disabled = false;
+
+      // no mobile bar
+    }
+
+    // Restore premium packaging check on refresh
+    const savedPackaging = localStorage.getItem('bh_premium_packaging');
+    if (savedPackaging === 'true') {
+      premiumPackagingCheckbox.checked = true;
+    }
+
+    // Checkout redirect
+    btnCheckout.addEventListener('click', () => {
+      if (cart.length > 0) {
+        window.location.href = '../review order/index.html';
+      }
+    });
+  </script>
+</body>
+</html>

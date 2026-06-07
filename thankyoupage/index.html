@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You | Bengali Hotel Restaurant</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- jsPDF & autoTable libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    .action-buttons-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      width: 100%;
+      margin: 25px 0 15px;
+    }
+    
+    .btn-action {
+      flex: 1;
+      max-width: 220px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-family: var(--font-sans), sans-serif;
+    }
+
+    .btn-download-pdf {
+      background-color: var(--color-gold) !important;
+      color: var(--color-primary-dark) !important;
+      border: 2px solid var(--color-gold) !important;
+    }
+    
+    .btn-download-pdf:hover {
+      background-color: var(--color-gold-hover) !important;
+      border-color: var(--color-gold-hover) !important;
+      color: var(--color-surface-white) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-download-pdf:active {
+      transform: translateY(0);
+    }
+
+    .btn-share-receipt {
+      background-color: var(--color-primary-maroon) !important;
+      color: var(--color-surface-white) !important;
+      border: 2px solid var(--color-primary-maroon) !important;
+    }
+
+    .btn-share-receipt:hover {
+      background-color: var(--color-primary-dark) !important;
+      border-color: var(--color-primary-dark) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(128, 0, 0, 0.25);
+    }
+
+    .btn-share-receipt:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 600px) {
+      .action-buttons-group {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-action {
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+
+    /* --- Responsive Overrides --- */
+    @media (max-width: 768px) {
+      .thankyou-container {
+        margin: 20px auto !important;
+        padding: 20px 15px !important;
+      }
+      .thankyou-container h2 {
+        font-size: 1.8rem !important;
+      }
+      .disclaimer-box {
+        padding: 15px !important;
+        margin: 15px 0 !important;
+      }
+      .receipt-summary-box {
+        padding: 15px !important;
+        margin: 15px 0 !important;
+      }
+    }
+
+
+    /* Share Modal Styles */
+    .share-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    
+    .share-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .share-modal {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 2px solid var(--color-gold);
+      transform: scale(0.9);
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+    
+    .share-modal-overlay.active .share-modal {
+      transform: scale(1);
+    }
+    
+    .share-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--color-border-light);
+      padding-bottom: 12px;
+    }
+    
+    .share-title {
+      font-family: var(--font-serif), serif;
+      color: var(--color-primary-dark);
+      font-size: 1.25rem;
+      margin: 0;
+    }
+    
+    .share-close {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    
+    .share-close:hover {
+      color: var(--color-primary-maroon);
+    }
+    
+    .share-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .share-option-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      border-radius: 10px;
+      background: var(--color-surface-cream);
+      border: 1px solid rgba(212,175,55,0.15);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: var(--color-text-dark);
+      font-family: var(--font-sans), sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .share-option-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-gold);
+      background: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+    }
+    
+    .share-option-btn svg {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header>
+    <div class="container header-container">
+      <div onclick="window.location.href='../index.html'" style="cursor:pointer; display: flex; align-items: center; gap: 12px; transition: transform 0.2s ease, opacity 0.2s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.opacity='0.95';" onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';">
+        <img src="../login/logo.png?v=1.3" alt="Bengali Hotel Logo" style="height: 45px; width: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-gold); box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);">
+        <h1 style="font-size: 1.8rem; margin: 0; color: var(--color-surface-white);">Bengali <span style="color: var(--color-gold);">Hotel</span></h1>
+      </div>
+      <nav class="nav-links">
+        <a href="../Menu/index.html" class="nav-link">Order Again</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="thankyou-container">
+      <div class="thankyou-icon">✓</div>
+      
+      <h2 style="font-size: 2.2rem; color: var(--color-primary-dark); margin-bottom: 10px;">Order Placed Successfully!</h2>
+      <p style="color: var(--color-text-muted); font-size: 1.05rem;">
+        Thank you for dining with Bengali Hotel. Your order has been sent directly to the kitchen chef.
+      </p>
+
+      <div class="gold-divider">
+        <div class="gold-divider-diamond"></div>
+      </div>
+
+      <p style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gold-hover); font-weight: 600;">
+        Your Unique Order ID
+      </p>
+      <div class="thankyou-orderid" id="display-order-id">BH-XXXXXX</div>
+
+      <!-- Big Disclaimer for PDF Download -->
+      <div class="disclaimer-box" style="background: linear-gradient(135deg, #FCF9F2 0%, #FFFDF9 100%); border-left: 5px solid var(--color-gold); padding: 20px; border-radius: 8px; text-align: left; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 1px solid rgba(212,175,55,0.1); border-right: 1px solid rgba(212,175,55,0.1); border-bottom: 1px solid rgba(212,175,55,0.1);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <span style="font-size: 1.5rem; line-height: 1;">⚠️</span>
+          <h4 style="margin: 0; font-size: 1.1rem; color: var(--color-primary-dark); font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 0.05em;">Important Notice: Save Your Receipt</h4>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--color-text-dark); margin: 0; line-height: 1.5;">
+          Please download your PDF receipt below. You will need to show this digital invoice to the kitchen chef or delivery staff for order collection and payment verification.
+        </p>
+      </div>
+
+      <div class="receipt-summary-box" style="background-color: var(--color-surface-cream); border: 1px solid var(--color-border-light); padding: 24px; text-align: left; margin: 20px 0 25px 0;">
+        <h4 style="border-bottom: 1px solid var(--color-border-light); padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; color: var(--color-text-muted);">
+          Receipt Details
+        </h4>
+        <ul id="display-items-list" style="list-style: none; padding-left: 0; font-size: 0.95rem; margin-bottom: 15px;">
+          <!-- Dynamically populated -->
+        </ul>
+        <div style="border-top: 1px solid var(--color-border-light); padding-top: 10px; display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem; color: var(--color-primary-dark);">
+          <span>Total Amount</span>
+          <span id="display-total-amount">₹0</span>
+        </div>
+        <!-- Address Details -->
+        <div id="address-details-container" style="display: none; border-top: 1px dashed var(--color-border-light); margin-top: 15px; padding-top: 15px; font-size: 0.9rem; color: var(--color-text-dark);">
+          <span style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); font-weight: bold; margin-bottom: 5px;">📍 Delivery Address</span>
+          <strong id="display-address-text"></strong>
+        </div>
+      </div>
+
+      <!-- Action Buttons Group (Download & Share) -->
+      <div class="action-buttons-group">
+        <button class="btn-action btn-download-pdf" id="btn-download-pdf">
+          📄 Download Receipt PDF
+        </button>
+        <button class="btn-action btn-share-receipt" id="btn-share-receipt">
+          📱 Share Receipt
+        </button>
+      </div>
+
+      <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <button class="btn btn-primary" onclick="window.location.href='../Menu/index.html'" style="width: 100%; max-width: 320px;">
+          Back To Menu
+        </button>
+        <button class="btn btn-secondary" id="btn-logout-thankyou" style="width: 100%; max-width: 320px;">
+          Logout Session
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Modal Overlay -->
+  <div id="shareModalOverlay" class="share-modal-overlay">
+    <div class="share-modal">
+      <div class="share-header">
+        <h3 class="share-title">Share Receipt</h3>
+        <span class="share-close" id="closeShareModal">&times;</span>
+      </div>
+      <div class="share-options">
+        <a href="#" id="share-wa" target="_blank" class="share-option-btn">
+          <svg fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 001.37 5.054L2 22l5.077-1.331a9.923 9.923 0 004.934 1.314h.004c5.507 0 9.99-4.479 9.99-9.985.002-2.67-1.037-5.18-2.927-7.07C17.186 3.037 14.683 2 12.012 2zm5.728 14.102c-.314.88-1.547 1.621-2.127 1.725-.579.104-1.13.14-3.585-.827-3.144-1.239-5.164-4.408-5.321-4.618-.158-.21-1.277-1.688-1.277-3.22 0-1.53.801-2.28 1.087-2.585.286-.305.629-.38.839-.38.21 0 .42.003.604.012.193.009.452-.074.707.533.262.62.898 2.194.977 2.352.079.157.13.341.026.55-.105.21-.157.34-.314.524-.157.184-.329.41-.47.551-.158.158-.323.329-.14.643.184.314.817 1.343 1.748 2.171.93.827 1.71 1.082 2.037 1.248.328.166.52.14.712-.079.193-.218.827-.961 1.047-1.293.22-.331.44-.275.74-.162.3.113 1.911.902 2.226 1.06.315.158.525.236.604.368.079.13.079.756-.235 1.636z"/>
+          </svg>
+          WhatsApp
+        </a>
+        <a href="#" id="share-tg" target="_blank" class="share-option-btn">
+          <svg fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.58.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.37.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .24z"/>
+          </svg>
+          Telegram
+        </a>
+        <a href="#" id="share-email" class="share-option-btn">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          Email
+        </a>
+        <button id="share-copy" class="share-option-btn" style="border: 1px solid rgba(212,175,55,0.15); width: 100%;">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+          </svg>
+          Copy Text
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="../Menu/index.html">Our Menu</a></li>
+            <li><a href="#">Service</a></li>
+            <li><a href="#">Reservation</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Contact</h3>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span class="footer-contact-text">Saidulajab, Saket, New Delhi - 110030</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+            <span class="footer-contact-text">+91 9911796021</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+            <span class="footer-contact-text">bengalihotel.com</span>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h3>Opening Hours</h3>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Monday - Sunday</div>
+            <div class="footer-hours-val">12:30 PM - 2:00 AM</div>
+          </div>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Free Home Delivery</div>
+            <div class="footer-hours-val">Order Above Rs. 199</div>
+            <div class="footer-hours-val" style="font-size: 0.8rem; color: var(--color-gold); margin-top: 2px;">(Free delivery upto 1 km only)</div>
+          </div>
+          <div class="footer-hours-item">
+            <div class="footer-hours-title">Delivery Timings</div>
+            <div class="footer-hours-val">1:00 PM - 11:00 PM</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">
+          &copy; 2026 Bengali Hotel. All rights reserved. Developed by <a href="https://portfolio-shyamal-3s.vercel.app/" target="_blank">Shyamal Jana</a>
+        </div>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com/bengali.dhaba.3?mibextid=wwXIfr&rdid=2FfXTDLW8JQO5E12&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1ANrrqQkR9%2F%3Fmibextid%3DwwXIfr#" target="_blank" class="footer-social-btn" aria-label="Facebook">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/bengalihotelsaket" target="_blank" class="footer-social-btn" aria-label="Instagram">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase-js.js"></script>
+  <script src="../js/supabase.js?v=1.2"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Check Login Session
+      if (!SessionManager.isLoggedIn()) {
+        window.location.href = '../login/log.html';
+        return;
+      }
+
+      // 2. Read confirmation data from localStorage (restore from lastOrder if available)
+      let orderData = null;
+      const lastOrderStr = localStorage.getItem('lastOrder');
+      if (lastOrderStr) {
+        orderData = JSON.parse(lastOrderStr);
+      } else {
+        const fallbackOrderStr = localStorage.getItem('bh_last_order_confirmation');
+        if (fallbackOrderStr) {
+          orderData = JSON.parse(fallbackOrderStr);
+          // Save latest order details in localStorage as lastOrder
+          localStorage.setItem('lastOrder', JSON.stringify(orderData));
+        }
+      }
+
+      if (!orderData) {
+        // Redirect to menu if visited directly without ordering
+        window.location.href = '../Menu/index.html';
+        return;
+      }
+      
+      // Update UI elements
+      document.getElementById('display-order-id').textContent = orderData.orderId;
+      document.getElementById('display-total-amount').textContent = `₹${orderData.totalAmount}`;
+
+      if (orderData.address) {
+        document.getElementById('address-details-container').style.display = 'block';
+        const addr = orderData.address;
+        const receiverName = addr.receiver_name || '';
+        const receiverMobile = addr.receiver_mobile || '';
+        const pincode = addr.pincode || '';
+        document.getElementById('display-address-text').innerHTML = `
+          <div style="margin-bottom: 4px;"><strong>Receiver Name:</strong> ${receiverName}</div>
+          <div style="margin-bottom: 4px;"><strong>Receiver Mobile:</strong> ${receiverMobile}</div>
+          <div style="margin-bottom: 4px;"><strong>Pincode:</strong> ${pincode}</div>
+          <div><strong>Address:</strong> ${addr.flat_number}, ${addr.street}, ${addr.area}, ${addr.city}, ${addr.state} (Landmark: ${addr.landmark})</div>
+        `;
+      }
+
+      // Populate Items list
+      const itemsList = document.getElementById('display-items-list');
+      itemsList.innerHTML = '';
+      
+      orderData.items.forEach(item => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.justify = 'space-between';
+        li.style.marginBottom = '8px';
+        li.innerHTML = `
+          <span style="font-family: var(--font-serif); font-weight: 600; color: var(--color-primary-dark);">${item.name} <span style="font-family: var(--font-sans); font-size: 0.85rem; font-weight: normal; color: var(--color-text-muted);">x${item.qty}</span></span>
+          <span>₹${item.price * item.qty}</span>
+        `;
+        itemsList.appendChild(li);
+      });
+
+      // Get customer profile info
+      const customer = SessionManager.getCurrentCustomer() || { name: orderData.customerName, mobile: 'N/A' };
+      const customerMobile = customer.mobile;
+
+      const orderDateStr = new Date().toLocaleString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+
+      // 3. Handle PDF Download Action using jsPDF & jspdf-autotable
+      document.getElementById('btn-download-pdf').addEventListener('click', () => {
+        const btn = document.getElementById('btn-download-pdf');
+        const origContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `
+          <svg class="animate-spin" style="width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.25"></path>
+          </svg>
+          Generating PDF...
+        `;
+        
+        // Define inline spin animation
+        if (!document.getElementById('pdf-spin-style')) {
+          const spinStyle = document.createElement('style');
+          spinStyle.id = 'pdf-spin-style';
+          spinStyle.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+          document.head.appendChild(spinStyle);
+        }
+
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+          });
+
+          // 3.1. Draw Logo (circle styled in PDF)
+          const logoImg = document.querySelector('header img');
+          if (logoImg) {
+            try {
+              doc.addImage(logoImg, 'PNG', 14, 15, 20, 20);
+            } catch (e) {
+              console.error('Failed to add logo image to jsPDF:', e);
+            }
+          }
+
+          // 3.2. Header Text
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(22);
+          doc.setTextColor(128, 0, 0); // Primary Maroon (#800000)
+          doc.text('Bengali Hotel', 38, 22);
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(212, 175, 55); // Gold Accent (#D4AF37)
+          doc.text('HERITAGE CULINARY DINING EXPERIENCE', 38, 27);
+
+          doc.setFontSize(8);
+          doc.setTextColor(90, 65, 61); // Muted text (#5a413d)
+          doc.text('Saidulajab, Saket, New Delhi | Tel: +91 9911796021', 38, 32);
+
+          // Divider
+          doc.setDrawColor(212, 175, 55);
+          doc.setLineWidth(0.5);
+          doc.line(14, 40, 196, 40);
+
+          // 3.3. Customer Meta Info
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.setTextColor(87, 0, 0); // Primary Dark (#570000)
+          doc.text('Order Confirmation & Invoice', 14, 48);
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(26, 26, 26);
+          
+          doc.text(`Customer Name: ${orderData.customerName}`, 14, 54);
+          doc.text(`Mobile Number: ${customerMobile}`, 14, 59);
+
+          doc.text(`Order ID: ${orderData.orderId}`, 120, 54);
+          doc.text(`Date & Time: ${orderDateStr}`, 120, 59);
+
+          let tableStartY = 66;
+          if (orderData.address) {
+            const receiverName = orderData.address.receiver_name || '';
+            const receiverMobile = orderData.address.receiver_mobile || '';
+            const pincode = orderData.address.pincode || '';
+            const fullAddrText = `Delivery Address: ${orderData.address.flat_number}, ${orderData.address.street}, ${orderData.address.area}, ${orderData.address.city}, ${orderData.address.state} - ${pincode} (Landmark: ${orderData.address.landmark})`;
+            
+            doc.text(`Receiver Name: ${receiverName}`, 14, 64);
+            doc.text(`Receiver Mobile: ${receiverMobile}`, 14, 69);
+            
+            const wrappedAddress = doc.splitTextToSize(fullAddrText, 180);
+            doc.text(wrappedAddress, 14, 74);
+            tableStartY = 74 + (wrappedAddress.length * 4.5) + 2;
+          }
+
+          // 3.4. Items Table details
+          const tableHeaders = [['Item Name', 'Qty', 'Unit Price', 'Total']];
+          const tableRows = [];
+          
+          orderData.items.forEach(item => {
+            tableRows.push([
+              item.name,
+              item.qty.toString(),
+              `Rs. ${item.price}`,
+              `Rs. ${item.price * item.qty}`
+            ]);
+          });
+
+          // Reconstruct packaging details
+          const subtotal = orderData.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+          const packagingFee = orderData.totalAmount - subtotal;
+          if (packagingFee > 0) {
+            tableRows.push([
+              'Premium Heritage Packaging',
+              '1',
+              `Rs. ${packagingFee}`,
+              `Rs. ${packagingFee}`
+            ]);
+          }
+
+          // Render table
+          doc.autoTable({
+            head: tableHeaders,
+            body: tableRows,
+            startY: tableStartY,
+            theme: 'striped',
+            headStyles: {
+              fillColor: [128, 0, 0], // Maroon
+              textColor: [255, 255, 255],
+              fontStyle: 'bold'
+            },
+            columnStyles: {
+              0: { cellWidth: 90 },
+              1: { cellWidth: 20, halign: 'center' },
+              2: { cellWidth: 35, halign: 'right' },
+              3: { cellWidth: 35, halign: 'right' }
+            },
+            margin: { left: 14, right: 14 }
+          });
+
+          // Summary below table
+          let finalY = doc.lastAutoTable.finalY + 10;
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(90, 65, 61);
+          
+          doc.text('Subtotal:', 130, finalY);
+          doc.text(`Rs. ${subtotal}`, 190, finalY, { align: 'right' });
+
+          if (packagingFee > 0) {
+            finalY += 5;
+            doc.text('Packaging Charge:', 130, finalY);
+            doc.text(`Rs. ${packagingFee}`, 190, finalY, { align: 'right' });
+          }
+
+          finalY += 8;
+          // Divider line
+          doc.setDrawColor(212, 175, 55);
+          doc.line(130, finalY - 4, 196, finalY - 4);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(12);
+          doc.setTextColor(87, 0, 0); // Maroon
+          doc.text('Grand Total:', 130, finalY);
+          doc.text(`Rs. ${orderData.totalAmount}`, 190, finalY, { align: 'right' });
+
+          // 3.5. Footer details
+          finalY += 20;
+          doc.setFont('helvetica', 'italic');
+          doc.setFontSize(10);
+          doc.setTextColor(128, 0, 0);
+          doc.text('Thank you for ordering from Bengali Hotel.', 105, finalY, { align: 'center' });
+
+          // Save File
+          doc.save(`BengaliHotel-Receipt-${orderData.orderId}.pdf`);
+
+          // Restore button
+          btn.innerHTML = origContent;
+          btn.disabled = false;
+        } catch (err) {
+          console.error("PDF generation failed:", err);
+          alert("Could not generate PDF. Please try again.");
+          btn.innerHTML = origContent;
+          btn.disabled = false;
+        }
+      });
+
+      // 4. Handle Share Receipt Action
+      document.getElementById('btn-share-receipt').addEventListener('click', () => {
+        const itemsText = orderData.items.map(item => `${item.name} x${item.qty} - ₹${item.price * item.qty}`).join('\n');
+        let shareText = `🍛 BENGALI HOTEL RECEIPT 🍛\n\nOrder ID: ${orderData.orderId}\nCustomer: ${orderData.customerName}\nMobile: ${customerMobile}\n`;
+        if (orderData.address) {
+          shareText += `Address: ${orderData.address.full_address}\n`;
+        }
+        shareText += `\nOrdered Items:\n${itemsText}\n\nTotal Paid: ₹${orderData.totalAmount}\n\nThank you for ordering from Bengali Hotel!`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: 'Bengali Hotel Order Receipt',
+            text: shareText
+          }).then(() => console.log('Shared successfully'))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+          // Open custom share modal fallback
+          const shareModal = document.getElementById('shareModalOverlay');
+          
+          const encodedText = encodeURIComponent(shareText);
+          document.getElementById('share-wa').href = `https://api.whatsapp.com/send?text=${encodedText}`;
+          document.getElementById('share-tg').href = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodedText}`;
+          document.getElementById('share-email').href = `mailto:?subject=${encodeURIComponent('Bengali Hotel Order Receipt')}&body=${encodedText}`;
+          
+          shareModal.classList.add('active');
+        }
+      });
+
+      // 5. Close Share Modal handlers
+      document.getElementById('closeShareModal').addEventListener('click', () => {
+        document.getElementById('shareModalOverlay').classList.remove('active');
+      });
+      
+      document.getElementById('shareModalOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('shareModalOverlay')) {
+          document.getElementById('shareModalOverlay').classList.remove('active');
+        }
+      });
+
+      // 6. Copy Receipt Text button inside share modal
+      document.getElementById('share-copy').addEventListener('click', () => {
+        const itemsText = orderData.items.map(item => `${item.name} x${item.qty} - ₹${item.price * item.qty}`).join('\n');
+        let shareText = `🍛 BENGALI HOTEL RECEIPT 🍛\n\nOrder ID: ${orderData.orderId}\nCustomer: ${orderData.customerName}\nMobile: ${customerMobile}\n`;
+        if (orderData.address) {
+          shareText += `Address: ${orderData.address.full_address}\n`;
+        }
+        shareText += `\nOrdered Items:\n${itemsText}\n\nTotal Paid: ₹${orderData.totalAmount}\n\nThank you for ordering from Bengali Hotel!`;
+        
+        navigator.clipboard.writeText(shareText).then(() => {
+          alert('Receipt text copied to clipboard!');
+        }).catch(err => {
+          console.error('Failed to copy text:', err);
+        });
+      });
+    });
+
+    // Logout Action
+    document.getElementById('btn-logout-thankyou').addEventListener('click', () => {
+      SessionManager.logoutCustomer();
+      window.location.href = '../login/log.html';
+    });
+  </script>
+</body>
+</html>

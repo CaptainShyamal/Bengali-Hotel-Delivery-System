@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/admin", "destination": "/dashboard/index.html" },
+    { "source": "/checkout", "destination": "/review order/index.html" },
+    { "source": "/orders", "destination": "/thankyoupage/index.html" }
+  ]
+}
