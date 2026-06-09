@@ -1,6 +1,14 @@
 # 🍛 Bengali Hotel Restaurant Ordering System
 
 A high-fidelity, responsive online ordering and restaurant administration platform designed for **Bengali Hotel** (New Delhi). This system provides customers with a seamless menu browsing and checkout experience, and restaurant owners with a powerful analytics dashboard, security logging, and real-time multi-channel notification systems.
+---
+## Live Demo
+
+Customer Portal:
+https://bengalihotel.netlify.app
+
+Admin Dashboard:
+https://bengalihotel.netlify.app/dashboard
 
 ---
 
@@ -29,6 +37,9 @@ A high-fidelity, responsive online ordering and restaurant administration platfo
 ---
 
 ## 🛠️ Architecture & Tech Stack
+
+<img width="1536" height="1024" alt="bengali system" src="https://github.com/user-attachments/assets/0f7c62f1-bf62-414d-bcf1-41fbd4b870c7" />
+
 
 ```mermaid
 graph TD
@@ -158,3 +169,13 @@ The project includes pre-configured config mapping hooks. When importing to your
 * **Secrets Segregation**: Configuration tokens and credentials are kept out of version control and managed via build pipelines.
 * **Data Sanitization**: Standardized input validations for name inputs, pincodes, and 10-digit mobile parameters on the client-side.
 * **Database RLS Enforcements**: Ensures database actions match authorized user session scopes.
+
+---
+## Developed By
+
+Shyamal Jana
+
+- B.Tech CSE, VIT-AP University
+- Java | Python | Web Development
+- GitHub: https://github.com/CaptainShyamal
+- LinkedIn: https://www.linkedin.com/in/shyamal-jana
