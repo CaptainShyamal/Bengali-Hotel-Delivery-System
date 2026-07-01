@@ -193,10 +193,18 @@ const OrderManager = {
   },
 
   sendTelegramOrderNotification: async (orderData) => {
-    const token = orderData.telegramBotToken;
-    const chatId = orderData.telegramChatId;
-    if (!token || !chatId) {
+    const tokenStr = orderData.telegramBotToken;
+    const chatIdStr = orderData.telegramChatId;
+    if (!tokenStr || !chatIdStr) {
       console.warn('Telegram Bot Token or Chat ID not configured. Skipping Telegram notification.');
+      return;
+    }
+
+    const tokens = tokenStr.split(',').map(s => s.trim()).filter(Boolean);
+    const chatIds = chatIdStr.split(',').map(s => s.trim()).filter(Boolean);
+
+    if (tokens.length === 0 || chatIds.length === 0) {
+      console.warn('Telegram Bot Token or Chat ID empty. Skipping Telegram notification.');
       return;
     }
 
@@ -246,22 +254,27 @@ ${orderData.orderTime}
 
 ━━━━━━━━━━━━━━━━━━━━━━`;
 
-    try {
-      const url = `https://api.telegram.org/bot${token}/sendMessage`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML'
-        })
-      });
-      const resJson = await response.json();
-      console.log('Telegram sendMessage response:', resJson);
-    } catch (err) {
-      console.error('Failed to send Telegram notification:', err);
-      // Fail silently, do not throw to allow order workflow completion
+    for (let i = 0; i < chatIds.length; i++) {
+      const activeChatId = chatIds[i];
+      const activeToken = tokens[i] || tokens[0];
+
+      try {
+        const url = `https://api.telegram.org/bot${activeToken}/sendMessage`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: activeChatId,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+        const resJson = await response.json();
+        console.log(`Telegram sendMessage to ${activeChatId} response:`, resJson);
+      } catch (err) {
+        console.error(`Failed to send Telegram notification to ${activeChatId}:`, err);
+        // Fail silently, do not throw to allow order workflow completion
+      }
     }
   },
 
@@ -342,8 +355,12 @@ ${orderData.orderTime}
 
     // Trigger Telegram Status Update message
     if (telegramBotToken && telegramChatId) {
-      const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-      const statusMessage = `🔄 <b>ORDER STATUS UPDATED</b>
+      const tokens = telegramBotToken.split(',').map(s => s.trim()).filter(Boolean);
+      const chatIds = telegramChatId.split(',').map(s => s.trim()).filter(Boolean);
+
+      if (tokens.length > 0 && chatIds.length > 0) {
+        const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+        const statusMessage = `🔄 <b>ORDER STATUS UPDATED</b>
 
 Order ID: ${shortOrderId}
 
@@ -353,21 +370,27 @@ New Status: ${newStatus}
 
 Time: ${timestamp}`;
 
-      try {
-        const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: telegramChatId,
-            text: statusMessage,
-            parse_mode: 'HTML'
-          })
-        });
-        const resJson = await response.json();
-        console.log('Telegram status update notification response:', resJson);
-      } catch (err) {
-        console.error('Failed to send Telegram status update notification:', err);
+        for (let i = 0; i < chatIds.length; i++) {
+          const activeChatId = chatIds[i];
+          const activeToken = tokens[i] || tokens[0];
+
+          try {
+            const url = `https://api.telegram.org/bot${activeToken}/sendMessage`;
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: activeChatId,
+                text: statusMessage,
+                parse_mode: 'HTML'
+              })
+            });
+            const resJson = await response.json();
+            console.log(`Telegram status update to ${activeChatId} response:`, resJson);
+          } catch (err) {
+            console.error(`Failed to send Telegram status update notification to ${activeChatId}:`, err);
+          }
+        }
       }
     }
   },
