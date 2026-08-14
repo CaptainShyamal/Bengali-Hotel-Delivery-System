@@ -263,7 +263,15 @@
 
     <!-- Orders Management Panel -->
     <div class="dashboard-panel" style="margin-bottom: 40px;">
-      <h3 style="border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px; margin-bottom: 20px;">Recent Orders</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px; margin-bottom: 20px;">
+        <h3 style="margin: 0; border: none; padding: 0;">Recent Orders</h3>
+        <button class="btn btn-primary" id="btn-export-excel" style="padding: 6px 14px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+          <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Export Diners Excel
+        </button>
+      </div>
       <div class="table-responsive">
         <table class="data-table">
           <thead>
@@ -365,6 +373,59 @@
       e.preventDefault();
       await logoutAdmin();
     });
+
+    // Excel Export Button for Diners
+    const btnExportExcel = document.getElementById('btn-export-excel');
+    if (btnExportExcel) {
+      btnExportExcel.addEventListener('click', () => {
+        if (!allOrders || allOrders.length === 0) {
+          Toast.show('No order data available to export.', true);
+          return;
+        }
+
+        // Deduplicate customers who ordered
+        const uniqueCustomersMap = new Map();
+        allOrders.forEach(order => {
+          if (order.customer_name && order.customer_mobile) {
+            const name = order.customer_name.trim();
+            const mobile = order.customer_mobile.trim();
+            const key = `${name}_${mobile}`;
+            uniqueCustomersMap.set(key, { name, mobile });
+          }
+        });
+
+        const customerList = Array.from(uniqueCustomersMap.values());
+        if (customerList.length === 0) {
+          Toast.show('No customer details found in orders.', true);
+          return;
+        }
+
+        // Build CSV string
+        const csvRows = [];
+        csvRows.push(['Customer Name', 'Phone Number'].join(','));
+        
+        customerList.forEach(c => {
+          const nameEscaped = `"${c.name.replace(/"/g, '""')}"`;
+          const mobileEscaped = `"${c.mobile.replace(/"/g, '""')}"`;
+          csvRows.push([nameEscaped, mobileEscaped].join(','));
+        });
+
+        // Add UTF-8 BOM so Excel opens it correctly with any special characters
+        const csvContent = '\uFEFF' + csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Bengali_Hotel_Ordered_Customers_${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        Toast.show('Diners list exported successfully!');
+      });
+    }
 
     btnSaveSettings.addEventListener('click', async () => {
       const webhookUrl = webhookInput.value.trim();
