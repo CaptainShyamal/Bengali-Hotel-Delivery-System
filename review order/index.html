@@ -230,7 +230,7 @@
           <span id="receipt-subtotal">₹0</span>
         </div>
         <div class="cart-summary-row" id="receipt-packaging-row" style="display: none; font-size: 1rem;">
-          <span>Premium Packaging Fee</span>
+          <span>Premium Packaging Fee (Mandatory)</span>
           <span>₹20</span>
         </div>
         
@@ -425,7 +425,7 @@
         return;
       }
 
-      isPackagingEnabled = localStorage.getItem('bh_premium_packaging') === 'true';
+      isPackagingEnabled = true; // Premium packaging is mandatory
 
       renderReceipt();
     });

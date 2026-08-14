@@ -66,9 +66,9 @@ Display selected items
 Calculate subtotal
 Add packaging fee if selected
 Calculate final amount
-FR-4 Premium Packaging
+FR-4 Premium Packaging (Mandatory)
 Fee:₹20
-When selected:
+Always selected:
 Add ₹20 to total
 Store packaging status in database
 FR-5 Order Placement
