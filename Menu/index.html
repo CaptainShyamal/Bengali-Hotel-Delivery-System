@@ -542,7 +542,7 @@
             <label class="packaging-label">
               <input type="checkbox" id="premium-packaging-checkbox">
               <div>
-                <span class="packaging-title">Premium Packaging (₹100)</span>
+                <span class="packaging-title">Premium Packaging (₹20)</span>
                 <p class="packaging-desc">Eco-friendly clay pots and spill-proof metallic tin seals to preserve authentic taste.</p>
               </div>
             </label>
@@ -556,7 +556,7 @@
             </div>
             <div class="cart-summary-row" id="packaging-fee-row" style="display: none;">
               <span>Premium Packaging</span>
-              <span>₹100</span>
+              <span>₹20</span>
             </div>
             <div class="cart-summary-row total">
               <span>Total Amount</span>
@@ -662,17 +662,17 @@
       { id: 'rice-7', name: 'Onion Tomato Fried Rice', category: 'Rice Items', price: 100, desc: 'Zesty rice cooked with caramelized onions, tomatoes, and home spices.' },
       
       // 2. Veg Thali
-      { id: 'thali-v1', name: 'Veg Thali', category: 'Veg Thali', price: 80, desc: 'Rice + 4 Roti + Aloo Bhaja + Seasonal Sabji + Dal' },
+      { id: 'thali-v1', name: 'Veg Thali', category: 'Veg Thali', price: 100, desc: 'Rice + 4 Roti + Aloo Bhaja + Seasonal Sabji + Dal' },
       { id: 'thali-v2', name: 'Paneer Thali', category: 'Veg Thali', price: 200, desc: 'Rice + Roti + Aloo Bhaja + Paneer Curry' },
-      { id: 'thali-v3', name: 'Mix Thali', category: 'Veg Thali', price: 130, desc: 'Choose One Sabji:<br>Rajma / Chhole / Dal Makhani<br>Includes Rice + 4 Roti + Bhaja + Selected Sabji' },
+      { id: 'thali-v3', name: 'Mix Thali', category: 'Veg Thali', price: 150, desc: 'Choose One Sabji:<br>Rajma / Chhole / Dal Makhani<br>Includes Rice + 4 Roti + Bhaja + Selected Sabji' },
       
       // 3. Non Veg Thali
-      { id: 'thali-nv1', name: 'Fish Thali (Mustard)', category: 'Non Veg Thali', price: 200, desc: '2 pcs Mustard Fish Curry + Rice + 4 Roti + Dal + Bhaja' },
-      { id: 'thali-nv2', name: 'Fish Thali (Spicy)', category: 'Non Veg Thali', price: 200, desc: '2 pcs Spicy Fish Curry + Rice + 4 Roti + Dal + Bhaja' },
-      { id: 'thali-nv3', name: 'Egg Thali', category: 'Non Veg Thali', price: 150, desc: '2 pcs Egg Curry + Rice + 4 Roti + Dal + Bhaja' },
-      { id: 'thali-nv4', name: 'Chicken Thali', category: 'Non Veg Thali', price: 200, desc: '2 pcs Chicken Curry + Rice + 4 Roti + Dal + Bhaja' },
-      { id: 'thali-nv5', name: 'Mutton Thali', category: 'Non Veg Thali', price: 300, desc: '2 pcs Mutton Curry + Rice + 4 Roti + Dal + Bhaja' },
-      { id: 'thali-nv6', name: 'Prawns Thali', category: 'Non Veg Thali', price: 200, desc: '3–4 pcs Prawn Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv1', name: 'Fish Thali (Mustard)', category: 'Non Veg Thali', price: 210, desc: '2 pcs Mustard Fish Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv2', name: 'Fish Thali (Spicy)', category: 'Non Veg Thali', price: 210, desc: '2 pcs Spicy Fish Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv3', name: 'Egg Thali', category: 'Non Veg Thali', price: 160, desc: '2 pcs Egg Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv4', name: 'Chicken Thali', category: 'Non Veg Thali', price: 210, desc: '2 pcs Chicken Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv5', name: 'Mutton Thali', category: 'Non Veg Thali', price: 310, desc: '2 pcs Mutton Curry + Rice + 4 Roti + Dal + Bhaja' },
+      { id: 'thali-nv6', name: 'Prawns Thali', category: 'Non Veg Thali', price: 210, desc: '3–4 pcs Prawn Curry + Rice + 4 Roti + Dal + Bhaja' },
       
       // 4. Paratha Combo
       { id: 'combo-1', name: 'Plain Paratha Combo', category: 'Paratha Combo', price: 120, desc: '2 Plain Parathas + Seasonal Sabji + Salad' },
@@ -952,7 +952,7 @@
       
       // Calculate packaging
       const isPackagingSelected = premiumPackagingCheckbox.checked;
-      const packagingFee = isPackagingSelected ? 100 : 0;
+      const packagingFee = isPackagingSelected ? 20 : 0;
       
       if (isPackagingSelected) {
         packagingFeeRow.style.display = 'flex';

@@ -231,7 +231,7 @@
         </div>
         <div class="cart-summary-row" id="receipt-packaging-row" style="display: none; font-size: 1rem;">
           <span>Premium Packaging Fee</span>
-          <span>₹100</span>
+          <span>₹20</span>
         </div>
         
         <div class="receipt-total-row">
@@ -241,6 +241,9 @@
         <div style="margin-top: 10px; text-align: right;">
           <p style="font-size: 0.8rem; color: var(--color-text-muted); font-style: italic;">
             * Cash on Delivery / Pay at Restaurant. No online payment required.
+          </p>
+          <p style="font-size: 0.8rem; color: var(--color-text-muted); font-style: italic; margin-top: 4px;">
+            * Delivery Charge may be applicable based on your location.
           </p>
         </div>
       </div>
@@ -450,7 +453,7 @@
       // Update calculations
       document.getElementById('receipt-subtotal').textContent = `₹${subtotal}`;
       
-      const packagingFee = isPackagingEnabled ? 100 : 0;
+      const packagingFee = isPackagingEnabled ? 20 : 0;
       if (isPackagingEnabled) {
         document.getElementById('receipt-packaging-row').style.display = 'flex';
       } else {
