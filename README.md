@@ -16,7 +16,7 @@ https://bengalihotel.netlify.app/dashboard
 
 ### 1. Customer Ordering & Checkout Experience
 * **Dynamic Menu & Cart Management**: Clients can browse structured food categories (Veg/Non-Veg Thalis, Main Courses, Bread, Paratha Combos) with real-time price updates and quantity controls.
-* **Premium Packaging**: Mandatory checkout fee (+₹20) integrated into all orders and order logging.
+* **Packaging Charges**: Mandatory checkout fee (+₹20) integrated into all orders and order logging.
 * **Client-Side Invoice Compiler**: Dynamically generates and compiles custom receipt PDFs utilizing `jsPDF` for instant download.
 
 ### 2. Multi-Channel Notifications & Webhooks

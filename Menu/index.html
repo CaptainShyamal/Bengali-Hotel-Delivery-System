@@ -537,16 +537,6 @@
             <div class="cart-empty-msg">Your dining cart is empty. Add delicious dishes from our menu!</div>
           </div>
 
-          <!-- Premium Packaging Checkbox -->
-          <div class="packaging-box">
-            <label class="packaging-label">
-              <input type="checkbox" id="premium-packaging-checkbox" checked disabled>
-              <div>
-                <span class="packaging-title">Premium Packaging (₹20 - Mandatory)</span>
-                <p class="packaging-desc">Eco-friendly clay pots and spill-proof metallic tin seals. (Mandatory ₹20 added to grand total to preserve authentic taste)</p>
-              </div>
-            </label>
-          </div>
 
           <!-- Totals & Checkout -->
           <div class="cart-summary">
@@ -555,7 +545,7 @@
               <span id="cart-subtotal">₹0</span>
             </div>
             <div class="cart-summary-row" id="packaging-fee-row" style="display: none;">
-              <span>Premium Packaging (Mandatory)</span>
+              <span>Packaging Charges</span>
               <span>₹20</span>
             </div>
             <div class="cart-summary-row total">
@@ -741,7 +731,6 @@
     const cartSubtotalEl = document.getElementById('cart-subtotal');
     const cartTotalEl = document.getElementById('cart-total');
     const packagingFeeRow = document.getElementById('packaging-fee-row');
-    const premiumPackagingCheckbox = document.getElementById('premium-packaging-checkbox');
     const btnCheckout = document.getElementById('btn-checkout');
 
     // --- Initialization & Verification ---
@@ -899,11 +888,6 @@
       }
     };
 
-    premiumPackagingCheckbox.addEventListener('change', () => {
-      // Save packaging option in localStorage
-      localStorage.setItem('bh_premium_packaging', premiumPackagingCheckbox.checked);
-      updateCartUI();
-    });
 
     function updateCartUI() {
       // 1. Clear cart lists
@@ -951,14 +935,10 @@
       cartQtyBadge.textContent = totalQty;
       
       // Calculate packaging
-      const isPackagingSelected = premiumPackagingCheckbox.checked;
-      const packagingFee = isPackagingSelected ? 20 : 0;
+      const isPackagingSelected = true;
+      const packagingFee = 20;
       
-      if (isPackagingSelected) {
-        packagingFeeRow.style.display = 'flex';
-      } else {
-        packagingFeeRow.style.display = 'none';
-      }
+      packagingFeeRow.style.display = 'flex';
       
       const grandTotal = subtotal + packagingFee;
       
@@ -971,9 +951,7 @@
       // no mobile bar
     }
 
-    // Force premium packaging to be enabled and checked (mandatory)
-    premiumPackagingCheckbox.checked = true;
-    premiumPackagingCheckbox.disabled = true;
+    // Force packaging to be enabled (mandatory)
     localStorage.setItem('bh_premium_packaging', 'true');
 
     // Checkout redirect
